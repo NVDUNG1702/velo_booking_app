@@ -14,7 +14,9 @@ export default function ButtonComponent({ label, marginB, marginT, onPress }: Bu
     const { skyBlue, isDarkMode } = useModeColor();
 
     return (
-        <TouchableOpacity style={{ width: '90%', height: 50, marginTop: marginT || 30, marginBottom: marginB || 30 }}>
+        <TouchableOpacity style={{ width: '90%', height: 50, marginTop: marginT || 30, marginBottom: marginB || 30 }}
+            onPress={onPress}
+        >
             <View style={[styles.container, { backgroundColor: isDarkMode ? '' : skyBlue, borderColor: skyBlue }]}>
                 <Text style={[styles.label, { color: isDarkMode ? skyBlue : 'white' }]}>{label}</Text>
             </View >

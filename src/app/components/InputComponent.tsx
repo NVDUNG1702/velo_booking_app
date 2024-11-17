@@ -33,7 +33,7 @@ export default function InputComponent({ placeholder = 'Enter text', Icon, type,
                         </View>
                     )
                 }
-                <TextInput secureTextEntry={showPass} placeholder={placeholder} placeholderTextColor={errorMessage ? error : darkGrayLight} style={[{ color: errorMessage ? error : textLight, width: type === 'password' ? '80%' : '90%' }]} />
+                <TextInput onBlur={onBlur} onChangeText={onChangeText} secureTextEntry={showPass} placeholder={placeholder} placeholderTextColor={errorMessage ? error : darkGrayLight} style={[{ color: errorMessage ? error : textLight, width: type === 'password' ? '80%' : '90%' }]} />
                 {
                     type === 'password' && (
                         <TouchableOpacity onPress={handleHidOrShowPass}>

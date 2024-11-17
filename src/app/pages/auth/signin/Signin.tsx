@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import LogoSVG from '../../../assets/svg/Logo.svg';
 import { useModeColor } from '../../../hooks/ColorMode/UseModeTheme';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -10,6 +10,8 @@ import UserIcon from '../../../assets/IconComponents/UserIcon';
 import LockIcon from '../../../assets/IconComponents/LockIcon';
 import CheckBoxComponent from '../../../components/CheckBoxComponent';
 import ButtonComponent from '../../../components/ButtonComponent';
+import useSignin from '../../../hooks/auth/useSignin';
+import { Controller } from 'react-hook-form';
 
 type PropSignin = {
     navigation: StackNavigationProp<StackParamListLogin, 'signin'>;
@@ -17,7 +19,8 @@ type PropSignin = {
 
 export default function Signin({ navigation }: PropSignin) {
     const { backgroundStyle, textLight, skyBlue, darkGrayLight } = useModeColor();
-    const [remember, setRemember] = useState(false);
+
+    const { control, errors, handleSubmit, remember, setRemember } = useSignin();
 
     const handleNextForgot = () => {
         navigation.navigate('forgotPass');
@@ -34,10 +37,38 @@ export default function Signin({ navigation }: PropSignin) {
                 <Text style={[{ color: textLight }, styles.title]}>Sign In</Text>
             </View>
             <View style={[styles.formInput]}>
-                <InputComponent Icon={UserIcon} errorMessage='' placeholder='please enter username or email' />
-                <InputComponent Icon={LockIcon} errorMessage='' type='password' placeholder='please enter password' />
+                <Controller
+                    control={control}
+                    name="username"
+                    render={({ field: { onChange, value, onBlur } }) => (
+                        <InputComponent
+                            Icon={UserIcon}
+                            onChangeText={onChange}
+                            value={value}
+                            errorMessage={errors?.username?.message}
+                            placeholder='please enter username or email'
+                            onBlur={onBlur}
+                        />
+                    )}
+                />
+                <Controller
+                    control={control}
+                    name="password"
+                    render={({ field: { onChange, value, onBlur } }) => (
+                        <InputComponent
+                            Icon={LockIcon}
+                            errorMessage={errors?.password?.message}
+                            type='password'
+                            placeholder='please enter password'
+                            onChangeText={onChange}
+                            value={value}
+                            onBlur={onBlur}
+                        />
+                    )}
+                />
+
             </View>
-            <View style={[{ width: '90%' }, styles.containerRmAndForgot]}>
+            <View style={[{ width: '90%', marginTop: 10 }, styles.containerRmAndForgot]}>
                 <View style={[styles.containerCheckBox]}>
                     <CheckBoxComponent checked={remember} setCheck={setRemember} size={20} />
                     <Text style={[{ color: textLight, marginStart: 10 }]}>Remember me</Text>
@@ -52,7 +83,7 @@ export default function Signin({ navigation }: PropSignin) {
                     </TouchableOpacity>
                 </View>
             </View>
-            <ButtonComponent label='hello' marginT={50} />
+            <ButtonComponent label='hello' marginT={50} onPress={handleSubmit} />
             <Text style={{ marginTop: 30, color: darkGrayLight }}>
                 Don’t have an account?
             </Text>
