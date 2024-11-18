@@ -17,7 +17,7 @@ interface PropsHeaderComponent {
     handleClickIconRight?: () => void
 }
 
-export default memo(function HeaderComponent({ title = 'Login', showButtonLeft = true, navigation, iconRight, handleClickIconRight }: PropsHeaderComponent) {
+export default memo(function HeaderComponent({ title = '', showButtonLeft = true, navigation, iconRight, handleClickIconRight }: PropsHeaderComponent) {
     const { textLight } = useModeColor();
 
     const handleGoBack = () => {
