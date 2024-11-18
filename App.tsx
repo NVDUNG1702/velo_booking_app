@@ -5,20 +5,12 @@
  * @format
  */
 
-import {
-    Colors,
-    DebugInstructions,
-    Header,
-    LearnMoreLinks,
-    ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+
 import Navigation from './src/app/navigations/Navigation';
-import { View } from 'react-native';
 import { modeThemeStore } from './src/stores/zustandStore';
 import { useEffect } from 'react';
 import LayoutApp from './src/app/layouts/LayoutApp';
 import { useModeColor } from './src/app/hooks/ColorMode/UseModeTheme';
-
 
 export const App = () => {
     const { initializeMode } = modeThemeStore();
@@ -30,7 +22,6 @@ export const App = () => {
 
     return (
         <LayoutApp >
-
             <Navigation />
         </LayoutApp>
     )

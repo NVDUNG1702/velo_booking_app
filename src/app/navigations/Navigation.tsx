@@ -1,16 +1,17 @@
-import { StyleSheet, Text, View } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { createNavigationContainerRef, NavigationContainer } from '@react-navigation/native';
+import { createNavigationContainerRef, NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
 import Dashboard from '../pages/dashboard';
 import LoginNavigation from './LoginNavigation';
-
-export const navigationRef = createNavigationContainerRef();
-const Stack = createStackNavigator();
+import React from 'react';
 
 export type StackParamListNav = {
-    Dashboard: undefined,
-    Login: undefined
+    dashboard: undefined,
+    login: undefined
 }
+
+export const navigationRef = createNavigationContainerRef<StackParamListNav>();
+
+const Stack = createStackNavigator();
 
 const Navigation = () => {
     return (

@@ -13,7 +13,7 @@ export const useModeColor = () => {
 
     const blackColor = 'black';
     const whiteColor = 'white';
-    const error = '#ff8080';
+    const error = '#ff6666';
 
     const skyBlue = '#46BEF1'
     const deepSeaBlue = "#225971";

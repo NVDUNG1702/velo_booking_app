@@ -20,7 +20,7 @@ type PropSignin = {
 export default function Signin({ navigation }: PropSignin) {
     const { backgroundStyle, textLight, skyBlue, darkGrayLight } = useModeColor();
 
-    const { control, errors, handleSubmit, remember, setRemember } = useSignin();
+    const { control, errors, handleSubmit, remember, setRemember, handleErrorValid } = useSignin();
 
     const handleNextForgot = () => {
         navigation.navigate('forgotPass');

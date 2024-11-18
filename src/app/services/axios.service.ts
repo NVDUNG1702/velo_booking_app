@@ -4,10 +4,10 @@ import { getDataStorage, removeDataStorage, setDataStorage } from "../untils/loc
 import { jwtDecode } from 'jwt-decode';
 import dayjs from "dayjs";
 import { getTokenFromRefreshToken } from "../apis/auth/refreshToken";
-import { createNavigationContainerRef } from "@react-navigation/native";
+import { navigationRef } from "../navigations/Navigation";
 
 class AxiosService {
-    // private service: AxiosInstance;
+    private service: AxiosInstance;
     private JWT: string | null = null;
     private refreshToken: string | null = null;
 
@@ -28,12 +28,18 @@ class AxiosService {
 
                 if (!this.JWT) return config;
 
-                const user: any = jwtDecode(this.JWT);
+                let user: any = jwtDecode(this.JWT);
                 const isExpired = dayjs.unix(user?.exp).diff(dayjs()) < 1;
 
                 if (!isExpired) return config;
 
+
                 if (!this.refreshToken) return config;
+
+                user = jwtDecode(this.refreshToken);
+                const isExpiredRefreshToken = dayjs.unix(user?.exp).diff(dayjs()) < 1;
+
+                if (!isExpiredRefreshToken) return config;
 
                 let newToken = await getTokenFromRefreshToken(this.refreshToken);
                 if (!newToken) {
@@ -56,7 +62,9 @@ class AxiosService {
             }
         );
 
-        service.interceptors.response.use()
+        service.interceptors.response.use(this.handleResponSuccess, this.handleResponseError);
+
+        this.service = service;
     }
 
     private async init() {
@@ -76,15 +84,44 @@ class AxiosService {
 
     private handleResponseError(error: any) {
         const caseToRedirectLogin = ['Invalid token.', 'User Not Found'];
-        if (caseToRedirectLogin.includes(error.response?.data?.message) && navigationRef.isReady()) {
-            navigationRef;
+        if (caseToRedirectLogin.includes(error.response?.data?.message)) {
+            this.redirectToLogin();
+            return;
         }
+        if (error?.response?.tatus === 401) {
+            this.redirectToLogin();
+            return;
+        }
+        return Promise.reject(error);
     }
 
     redirectToLogin() {
         if (navigationRef.isReady()) {
-            // navigationRef.navigate("login")
+            navigationRef.navigate("login");
+            removeDataStorage(ACCESS_TOKEN);
+            removeDataStorage(REFRESH_TOKEN);
         }
     }
 
+    get(endpoint: string, config?: AxiosRequestConfig<any>) {
+        return this.service.get(endpoint, config);
+    }
+
+    post(endpoint: string, payload: any, config?: AxiosRequestConfig<any>) {
+        return this.service.post(endpoint, payload, config);
+    }
+
+    put(endpoint: string, payload?: any, config?: AxiosRequestConfig<any>) {
+        return this.service.put(endpoint, payload, config);
+    }
+
+    patch(endpoint: string, payload?: any, config?: AxiosRequestConfig<any>) {
+        return this.service.patch(endpoint, payload, config);
+    }
+
+    delete(endpoint: string) {
+        return this.service.delete(endpoint);
+    }
 }
+
+export default new AxiosService();

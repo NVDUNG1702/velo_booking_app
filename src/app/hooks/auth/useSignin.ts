@@ -1,10 +1,11 @@
-import { UserLoginForm } from './../../models/auth.model';
-import { useForm, SubmitHandler } from 'react-hook-form';
+import { UserLoginForm } from '../../models/authModel/auth.model';
+import { useForm, SubmitHandler, FieldErrors } from 'react-hook-form';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useEffect, useState } from 'react';
-import { Alert } from 'react-native';
+import { useState } from 'react';
 import { ToastError } from '../../untils/ToastMessage/toast';
+import { authStore } from '../../../stores/auth.store';
+import { getErrorResponse } from '../../untils/message';
 
 const schema = Yup.object().shape({
     username: Yup.string().min(4, "Must be unique and between 4 and 50 characters.").max(50, "Must be unique and between 4 and 50 characters.").required('Please enter your username!'),
@@ -12,6 +13,7 @@ const schema = Yup.object().shape({
 })
 
 export default function useSignin() {
+    const { isError, isLoading, login } = authStore();
     const [remember, setRemember] = useState(false);
     const { control, handleSubmit, formState: { errors }, clearErrors } = useForm<UserLoginForm>({
         resolver: yupResolver(schema),
@@ -21,11 +23,15 @@ export default function useSignin() {
         }
     });
 
-    const onSubmit: SubmitHandler<UserLoginForm> = (data) => {
-        console.log(data, remember);
+    const onSubmit: SubmitHandler<UserLoginForm> = async (data) => {
+        login(data);
+        if (isError) {
+            ToastError('Login error', getErrorResponse(isError));
+
+        }
     }
 
-    useEffect(() => {
+    const handleErrorValid = (errors: FieldErrors<UserLoginForm>) => {
         if (errors?.username?.message) {
             ToastError('Validation Error', errors?.username?.message);
         }
@@ -34,14 +40,14 @@ export default function useSignin() {
                 ToastError('Validation Error', errors?.password?.message);
             }
         }, errors?.username?.message ? 2500 : 0);
-    }, [errors]);
+    }
 
     return {
         remember,
         setRemember,
-        handleSubmit: handleSubmit(onSubmit),
+        handleSubmit: handleSubmit(onSubmit, handleErrorValid),
         errors,
         control,
-        clearErrors
+        clearErrors,
     }
 };
