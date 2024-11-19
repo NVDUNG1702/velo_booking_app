@@ -83,8 +83,8 @@ const styles = StyleSheet.create({
         height: '30%',
         objectFit: 'contain',
         position: 'absolute',
-        top: '20%'
-
+        top: '20%',
+        filter: 'blur(1)'
 
     },
     slide: {

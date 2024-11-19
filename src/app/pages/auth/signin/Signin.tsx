@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import LogoSVG from '../../../assets/svg/Logo.svg';
 import { useModeColor } from '../../../hooks/ColorMode/UseModeTheme';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -12,6 +12,7 @@ import CheckBoxComponent from '../../../components/CheckBoxComponent';
 import ButtonComponent from '../../../components/ButtonComponent';
 import useSignin from '../../../hooks/auth/useSignin';
 import { Controller } from 'react-hook-form';
+import LoadingComponent from '../../../components/LoadingComponent';
 
 type PropSignin = {
     navigation: StackNavigationProp<StackParamListLogin, 'signin'>;
@@ -20,7 +21,7 @@ type PropSignin = {
 export default function Signin({ navigation }: PropSignin) {
     const { backgroundStyle, textLight, skyBlue, darkGrayLight } = useModeColor();
 
-    const { control, errors, handleSubmit, remember, setRemember } = useSignin();
+    const { control, errors, handleSubmit, remember, setRemember, isLoading } = useSignin();
 
     const handleNextForgot = () => {
         navigation.navigate('forgotPass');
@@ -32,6 +33,7 @@ export default function Signin({ navigation }: PropSignin) {
 
     return (
         <View style={[backgroundStyle, styles.container]}>
+            <LoadingComponent loading={isLoading} />
             <LogoSVG width={'30%'} height={'20%'} />
             <View style={[styles.titleContainer]}>
                 <Text style={[{ color: textLight }, styles.title]}>Sign In</Text>

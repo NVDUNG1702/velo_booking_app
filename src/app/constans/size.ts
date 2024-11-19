@@ -17,5 +17,5 @@ export const SIZES = {
     H: height,
     t30: 30,
     icon35: 35,
-    icon25: 25
+    icon25: 25,
 }

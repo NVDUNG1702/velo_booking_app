@@ -10,11 +10,11 @@ interface ButtonProps {
     onPress?: () => void;
 }
 
-export default function ButtonComponent({ label, marginB, marginT, onPress }: ButtonProps) {
+export default function ButtonComponent({ label, marginB = 30, marginT = 30, onPress }: ButtonProps) {
     const { skyBlue, isDarkMode } = useModeColor();
 
     return (
-        <TouchableOpacity style={{ width: '90%', height: 50, marginTop: marginT || 30, marginBottom: marginB || 30 }}
+        <TouchableOpacity style={{ width: '90%', height: 50, marginTop: marginT, marginBottom: marginB }}
             onPress={onPress}
         >
             <View style={[styles.container, { backgroundColor: isDarkMode ? '' : skyBlue, borderColor: skyBlue }]}>
@@ -33,7 +33,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: 6,
         borderWidth: 1,
-        marginVertical: 30
     },
     label: {
         fontSize: SIZES.h1,

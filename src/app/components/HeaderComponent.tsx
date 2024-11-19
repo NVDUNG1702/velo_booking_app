@@ -5,6 +5,7 @@ import ArrowLeftIcon from '../assets/IconComponents/ArrowLeftIcon';
 import { SIZES } from '../constans/size';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { StackParamListLogin } from '../navigations/LoginNavigation';
+import { useSafeAreaStyle } from '../hooks/size/usesafeArea';
 
 
 
@@ -19,13 +20,13 @@ interface PropsHeaderComponent {
 
 export default memo(function HeaderComponent({ title = '', showButtonLeft = true, navigation, iconRight, handleClickIconRight }: PropsHeaderComponent) {
     const { textLight } = useModeColor();
-
+    const { heightSafeArea } = useSafeAreaStyle();
     const handleGoBack = () => {
         navigation.goBack();
     }
 
     return (
-        <View style={[styles.container]}>
+        <View style={[styles.container, { height: heightSafeArea * 0.05 }]}>
             <View style={[styles.buttonContainer]}>
                 {
                     showButtonLeft && (
@@ -50,11 +51,9 @@ export default memo(function HeaderComponent({ title = '', showButtonLeft = true
 const styles = StyleSheet.create({
     container: {
         width: '100%',
-        height: '5%',
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
-
     },
     buttonContainer: {
         width: '10%',
