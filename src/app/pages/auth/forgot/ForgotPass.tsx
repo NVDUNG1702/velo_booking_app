@@ -7,7 +7,7 @@ import OTPModelComponent from '../../../components/OTPModelComponent';
 export default function ForgotPass() {
     return (
         <View>
-            <OTPModelComponent />
+            <OTPModelComponent email=''/>
         </View>
     )
 }

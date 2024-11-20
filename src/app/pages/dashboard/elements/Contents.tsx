@@ -1,10 +1,12 @@
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, ImageSourcePropType, ListRenderItemInfo, StyleSheet, Text, View } from 'react-native';
 import React, { } from 'react';
 import { useModeColor } from '../../../hooks/ColorMode/UseModeTheme';
 import image1 from '../../../assets/img.jpg';
 import AppIntroSlider from 'react-native-app-intro-slider';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { StackParamListNav } from '../../../navigations/Navigation';
 
-const slides = [
+const slides: TypeItem[] = [
     {
         key: 1,
         title: 'Explore Upcoming and Nearby Events \n',
@@ -29,12 +31,24 @@ const slides = [
 ];
 
 
-const Contents = ({ navigation }) => {
+interface ContentProps {
+    navigation: StackNavigationProp<StackParamListNav, 'dashboard'>
+}
+
+type TypeItem = {
+    key: string | number,
+    title: string,
+    text: string,
+    image: ImageSourcePropType,
+    backgroundColor: string
+}
+
+const Contents = ({ navigation }: ContentProps) => {
     const { textLight, backgroundStyle, skyBlue } = useModeColor();
 
-    const _renderItem = ({ item }) => {
+    const _renderItem = ({ item }: { item: TypeItem }) => {
         return (
-            <View style={[styles.slide]}>
+            <View style={[styles.slide]} key={item.key}>
                 <Image source={item.image} style={[styles.image]} />
                 <View style={[styles.contentContainer, {}]}>
                     <Text style={[styles.title, { color: textLight }]}>{item.title}</Text>
@@ -44,7 +58,7 @@ const Contents = ({ navigation }) => {
         );
     };
 
-    const renderLabel = (label) => {
+    const renderLabel = (label: string): any => {
         return <Text style={{ color: textLight, fontWeight: '500' }}>{label}</Text>
     };
 
@@ -106,5 +120,8 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         fontWeight: '600'
+    },
+    text: {
+
     }
 })

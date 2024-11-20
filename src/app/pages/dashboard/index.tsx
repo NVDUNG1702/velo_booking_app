@@ -5,7 +5,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { StackParamListNav } from '../../navigations/Navigation';
 
 type Props = {
-    navigation: StackNavigationProp<StackParamListNav, 'Dashboard'>;
+    navigation: StackNavigationProp<StackParamListNav, 'dashboard'>;
 };
 
 export default function Dashboard({ navigation }: Props) {

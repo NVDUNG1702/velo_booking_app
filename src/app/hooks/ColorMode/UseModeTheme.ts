@@ -15,7 +15,8 @@ export const useModeColor = () => {
     const whiteColor = 'white';
     const error = '#ff6666';
 
-    const skyBlue = '#46BEF1'
+    const skyBlue = '#46BEF1';
+    const skyBlueDisabled = '#d0eefb'
     const deepSeaBlue = "#225971";
     const darkGrayLight = isDarkMode ? '#bfbfbf' : '#737373';
 
@@ -35,6 +36,7 @@ export const useModeColor = () => {
         textLight,
         backgroundStyle,
         error,
-        darkGrayLight
+        darkGrayLight,
+        skyBlueDisabled
     }
 }

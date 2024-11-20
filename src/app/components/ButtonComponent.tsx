@@ -8,17 +8,20 @@ interface ButtonProps {
     marginT?: number;
     marginB?: number;
     onPress?: () => void;
+    disabled?: boolean;
 }
 
-export default function ButtonComponent({ label, marginB = 30, marginT = 30, onPress }: ButtonProps) {
-    const { skyBlue, isDarkMode } = useModeColor();
+export default function ButtonComponent({ label, marginB = 30, marginT = 30, onPress, disabled = false }: ButtonProps) {
+    const { skyBlue, isDarkMode, skyBlueDisabled } = useModeColor();
 
     return (
-        <TouchableOpacity style={{ width: '90%', height: 50, marginTop: marginT, marginBottom: marginB }}
+        <TouchableOpacity
+            disabled={disabled}
+            style={{ width: '90%', height: 50, marginTop: marginT, marginBottom: marginB }}
             onPress={onPress}
         >
-            <View style={[styles.container, { backgroundColor: isDarkMode ? '' : skyBlue, borderColor: skyBlue }]}>
-                <Text style={[styles.label, { color: isDarkMode ? skyBlue : 'white' }]}>{label}</Text>
+            <View style={[styles.container, { backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0)' : disabled ? skyBlueDisabled : skyBlue, borderColor: disabled ? skyBlueDisabled : skyBlue }]}>
+                <Text style={[styles.label, { color: !isDarkMode ? 'white' : disabled ? skyBlueDisabled : skyBlue }]}>{label}</Text>
             </View >
         </TouchableOpacity>
 

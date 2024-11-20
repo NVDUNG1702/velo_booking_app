@@ -26,8 +26,8 @@ type StateUseSignup = {
 
 export default function useSignup() {
     const [stateSignUp, setStateSignUp] = useState<StateUseSignup>({ isLoading: false, isError: null });
-
-    const { control, clearErrors, handleSubmit, formState: { errors, } } = useForm<UserSignupData>({
+    const [visibleOTP, setVisibleOTP] = useState(false);
+    const { control, handleSubmit, formState: { errors }, getValues } = useForm<UserSignupData>({
         resolver: yupResolver(schema),
         defaultValues: {
             email: '',
@@ -40,6 +40,7 @@ export default function useSignup() {
 
     const onSubmit: SubmitHandler<UserSignupData> = async (data) => {
         setStateSignUp({ isError: null, isLoading: true });
+        setVisibleOTP(true)
         try {
             const response = await signup(data);
             ToastSuccess("SignUp successful", `Hello ${response.full_name}!`);
@@ -76,6 +77,9 @@ export default function useSignup() {
         isLoading: stateSignUp.isLoading,
         control,
         handleSubmit: handleSubmit(onSubmit, handleError),
-        errors
+        errors,
+        getValues,
+        visibleOTP,
+        setVisibleOTP
     }
 }

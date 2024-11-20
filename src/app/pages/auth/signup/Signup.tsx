@@ -1,5 +1,5 @@
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import HeaderComponent from '../../../components/HeaderComponent'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { StackParamListLogin } from '../../../navigations/LoginNavigation'
@@ -17,6 +17,7 @@ import { useSafeAreaStyle } from '../../../hooks/size/usesafeArea'
 import useSignup from '../../../hooks/auth/useSignup'
 import { Controller } from 'react-hook-form'
 import LoadingComponent from '../../../components/LoadingComponent'
+import OTPModelComponent from '../../../components/OTPModelComponent'
 
 interface PropSigup {
   navigation: StackNavigationProp<StackParamListLogin, 'signup'>
@@ -26,7 +27,7 @@ export default function Signup({ navigation }: PropSigup) {
 
   const { backgroundStyle, textLight, darkGrayLight, skyBlue } = useModeColor();
   const { heightSafeArea } = useSafeAreaStyle();
-  const { control, handleSubmit, isLoading, errors } = useSignup();
+  const { control, handleSubmit, isLoading, errors, getValues, setVisibleOTP, visibleOTP } = useSignup();
 
   const handleGoBack = () => {
     navigation.goBack();
@@ -36,6 +37,7 @@ export default function Signup({ navigation }: PropSigup) {
   return (
     <View style={[styles.container, backgroundStyle]}>
       <LoadingComponent loading={isLoading} />
+      <OTPModelComponent email={getValues().email} visible={visibleOTP} handleHidModal={setVisibleOTP} />
       <HeaderComponent navigation={navigation} />
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
