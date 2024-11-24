@@ -27,7 +27,8 @@ type StateUseSignup = {
 export default function useSignup() {
     const [stateSignUp, setStateSignUp] = useState<StateUseSignup>({ isLoading: false, isError: null });
     const [visibleOTP, setVisibleOTP] = useState(false);
-    const { control, handleSubmit, formState: { errors }, getValues } = useForm<UserSignupData>({
+
+    const { control, handleSubmit, formState: { errors }, getValues, reset } = useForm<UserSignupData>({
         resolver: yupResolver(schema),
         defaultValues: {
             email: '',

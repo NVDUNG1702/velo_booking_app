@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { useModeColor } from '../hooks/ColorMode/UseModeTheme'
 import { SIZES } from '../constans/size';
@@ -15,15 +15,20 @@ export default function ButtonComponent({ label, marginB = 30, marginT = 30, onP
     const { skyBlue, isDarkMode, skyBlueDisabled } = useModeColor();
 
     return (
-        <TouchableOpacity
+        <Pressable
             disabled={disabled}
-            style={{ width: '90%', height: 50, marginTop: marginT, marginBottom: marginB }}
+            style={({ pressed }) => {
+                return [
+                    { width: '90%', height: 50, marginTop: marginT, marginBottom: marginB },
+                    pressed && styles.pressedStyle
+                ]
+            }}
             onPress={onPress}
         >
             <View style={[styles.container, { backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0)' : disabled ? skyBlueDisabled : skyBlue, borderColor: disabled ? skyBlueDisabled : skyBlue }]}>
                 <Text style={[styles.label, { color: !isDarkMode ? 'white' : disabled ? skyBlueDisabled : skyBlue }]}>{label}</Text>
             </View >
-        </TouchableOpacity>
+        </Pressable>
 
     )
 }
@@ -40,5 +45,9 @@ const styles = StyleSheet.create({
     label: {
         fontSize: SIZES.h1,
         fontWeight: '500'
+    },
+    pressedStyle: {
+        transform: [{ scale: 0.98 }],
+        opacity: 0.5
     }
 })

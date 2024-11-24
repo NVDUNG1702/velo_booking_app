@@ -1,7 +1,7 @@
 import { Image, ImageSourcePropType, ListRenderItemInfo, StyleSheet, Text, View } from 'react-native';
 import React, { } from 'react';
 import { useModeColor } from '../../../hooks/ColorMode/UseModeTheme';
-import image1 from '../../../assets/img.jpg';
+const image1 = require('../../../assets/img.jpg');
 import AppIntroSlider from 'react-native-app-intro-slider';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { StackParamListNav } from '../../../navigations/Navigation';
@@ -32,7 +32,7 @@ const slides: TypeItem[] = [
 
 
 interface ContentProps {
-    navigation: StackNavigationProp<StackParamListNav, 'dashboard'>
+    navigation: StackNavigationProp<StackParamListNav, 'intro'>
 }
 
 type TypeItem = {

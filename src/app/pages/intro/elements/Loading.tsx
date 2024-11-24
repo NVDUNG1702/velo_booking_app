@@ -3,6 +3,7 @@ import React from 'react'
 import { useModeColor } from '../../../hooks/ColorMode/UseModeTheme'
 import LottieView from 'lottie-react-native';
 import LoadingAnimation from '../../../assets/Animation - 1731666331756.json';
+
 export default function Loading() {
     const { skyBlue, deepSeaBlue, backgroundStyle, toggleColorMode } = useModeColor();
     return (

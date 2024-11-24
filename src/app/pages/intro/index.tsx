@@ -5,10 +5,10 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { StackParamListNav } from '../../navigations/Navigation';
 
 type Props = {
-    navigation: StackNavigationProp<StackParamListNav, 'dashboard'>;
+    navigation: StackNavigationProp<StackParamListNav, 'intro'>;
 };
 
-export default function Dashboard({ navigation }: Props) {
+export default function Intro({ navigation }: Props) {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {

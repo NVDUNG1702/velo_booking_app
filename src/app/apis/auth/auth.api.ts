@@ -1,10 +1,12 @@
+import axios from "axios";
 import { UserLoginPayload, UserResponse, UserSignupPayload, UserSignupResponse } from "../../models/authModel/auth.model";
+import { OTPEmailPayload, OTPEmailResponse } from "../../models/authModel/otp.model";
 import axiosService from "../../services/axios.service";
 
 const BASE_URL = '/auth';
 
 export const login = async (payload: UserLoginPayload): Promise<NonNullable<UserResponse>> => {
-    const response = await axiosService.post(`${BASE_URL}/login`, payload);
+    const response = await axios.post(`${BASE_URL}/login`, payload);
     return response?.data;
 }
 
@@ -13,4 +15,7 @@ export const signup = async (payload: UserSignupPayload): Promise<NonNullable<Us
     return response.data;
 }
 
-// export const senOTP = async (payload: )
+export const senOTPByMail = async (payload: OTPEmailPayload): Promise<NonNullable<OTPEmailResponse>> => {
+    const response = await axios.post(`${BASE_URL}/send-otp-mail`, payload);
+    return response.data;
+}

@@ -23,6 +23,7 @@ export const authStore = create<authSoreState>()((set) => (
         login: async (payload) => {
             try {
                 set({ isLoading: true, isError: null, userDetail: null });
+                navigationRef.navigate('navHome');
                 const response = await login(payload);
 
                 const { accessToken, id, refreshToken, username, email, full_name, phone } = response;
