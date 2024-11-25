@@ -26,12 +26,6 @@ export default function useSignin() {
         login(data);
     }
 
-    useEffect(() => {
-        if (isError) {
-            ToastError('Login error', isError);
-        }
-    }, [isError]);
-
     const handleErrorValid = (errors: FieldErrors<UserLoginForm>) => {
         const fields: { field: keyof UserLoginForm, label: string }[] = [
             { field: 'username', label: 'Username' },

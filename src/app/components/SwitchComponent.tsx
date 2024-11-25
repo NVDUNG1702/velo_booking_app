@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { memo, useState } from 'react';
 import { StyleSheet, View, TouchableWithoutFeedback, Text } from 'react-native';
 import Animated, {
     useSharedValue,
@@ -16,7 +16,7 @@ interface SwitchProps {
     setSelect: (value: string) => void
 }
 
-const SwitchComponent = ({ value1, value2, selected, setSelect }: SwitchProps) => {
+const SwitchComponent = memo(({ value1, value2, selected, setSelect }: SwitchProps) => {
 
     const translateX = useSharedValue(0);
 
@@ -58,7 +58,7 @@ const SwitchComponent = ({ value1, value2, selected, setSelect }: SwitchProps) =
 
             <TouchableWithoutFeedback onPress={() => handleSwitch(value1)}>
                 <View style={styles.option}>
-                    <Text style={[styles.text, selected === value1 && styles.selectedText, ]}>
+                    <Text style={[styles.text, selected === value1 && styles.selectedText,]}>
                         {value1}
                     </Text>
                 </View>
@@ -73,7 +73,7 @@ const SwitchComponent = ({ value1, value2, selected, setSelect }: SwitchProps) =
             </TouchableWithoutFeedback>
         </View>
     );
-};
+});
 
 const styles = StyleSheet.create({
     container: {

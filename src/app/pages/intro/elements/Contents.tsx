@@ -1,41 +1,16 @@
-import { Image, ImageSourcePropType, ListRenderItemInfo, StyleSheet, Text, View } from 'react-native';
+import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native';
 import React, { } from 'react';
 import { useModeColor } from '../../../hooks/ColorMode/UseModeTheme';
-const image1 = require('../../../assets/img.jpg');
 import AppIntroSlider from 'react-native-app-intro-slider';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { StackParamListNav } from '../../../navigations/Navigation';
-
-const slides: TypeItem[] = [
-    {
-        key: 1,
-        title: 'Explore Upcoming and Nearby Events \n',
-        text: 'In publishing and graphic design, Lorem is a placeholder text commonly ',
-        image: image1,
-        backgroundColor: '#59b2ab',
-    },
-    {
-        key: 2,
-        title: 'Web Have Modern Events Calendar Feature \n',
-        text: 'In publishing and graphic design, Lorem is a placeholder text commonly ',
-        image: image1,
-        backgroundColor: '#febe29',
-    },
-    {
-        key: 3,
-        title: 'To Look Up More Events or Activities Nearby By Map \n',
-        text: ' In publishing and graphic design, Lorem is a placeholder text commonly ',
-        image: image1,
-        backgroundColor: '#22bcb5',
-    }
-];
-
+import { slidesData } from '../../../datas/intro';
 
 interface ContentProps {
     navigation: StackNavigationProp<StackParamListNav, 'intro'>
 }
 
-type TypeItem = {
+export type TypeItem = {
     key: string | number,
     title: string,
     text: string,
@@ -69,7 +44,7 @@ const Contents = ({ navigation }: ContentProps) => {
     return (
         <View style={[backgroundStyle, styles.container]}>
             <AppIntroSlider
-                data={slides}
+                data={slidesData}
                 renderItem={_renderItem}
                 showPrevButton
                 showSkipButton

@@ -18,4 +18,6 @@ export const SIZES = {
     t30: 30,
     icon35: 35,
     icon25: 25,
+    icon15: 15,
+    icon20: 20,
 }

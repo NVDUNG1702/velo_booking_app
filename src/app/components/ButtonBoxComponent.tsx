@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text } from 'react-native'
-import React, { useState } from 'react'
+import React, { memo, useState } from 'react'
 import { useModeColor } from '../hooks/ColorMode/UseModeTheme';
 import Svg, { Path } from 'react-native-svg';
 import { SIZES } from '../constans/size';
@@ -16,7 +16,7 @@ interface ButtonProps {
 }
 
 
-export default function ButtonBoxCustomer({ width, height, fill, border, onClick, marginTop = 10, marginBottom = 10, label = 'Click Me' }: ButtonProps) {
+export default memo(function ButtonBoxCustomer({ width, height, fill, border, onClick, marginTop = 10, marginBottom = 10, label = 'Click Me' }: ButtonProps) {
     const { skyBlue, skyBlueDisabled } = useModeColor();
     const [isPressed, setIsPressed] = useState(false);
     return (
@@ -41,7 +41,7 @@ export default function ButtonBoxCustomer({ width, height, fill, border, onClick
             <Text style={styles.text}>{label}</Text>
         </Pressable>
     );
-}
+});
 
 const styles = StyleSheet.create({
     button: {

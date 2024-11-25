@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React from 'react'
+import React, { memo } from 'react'
 // import CheckIcon from '../assets/svg/check.svg'
 import { SIZES } from '../constans/size';
 import { useModeColor } from '../hooks/ColorMode/UseModeTheme';
@@ -10,7 +10,7 @@ interface CheckBoxProps {
     size?: number
 }
 
-export default function CheckBoxComponent({ checked, setCheck, size = SIZES.icon25 }: CheckBoxProps) {
+export default memo(function CheckBoxComponent({ checked, setCheck, size = SIZES.icon25 }: CheckBoxProps) {
     const { darkGrayLight } = useModeColor();
     const handleSetCheck = () => {
         setCheck(!checked);
@@ -24,7 +24,7 @@ export default function CheckBoxComponent({ checked, setCheck, size = SIZES.icon
         </TouchableOpacity>
 
     )
-}
+});
 
 const styles = StyleSheet.create({
     container: {

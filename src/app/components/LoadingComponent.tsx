@@ -1,5 +1,5 @@
 import { Modal, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, { memo } from 'react'
 import LottieView from 'lottie-react-native';
 import loadingAnimation from '../assets/json/loading.json';
 
@@ -7,7 +7,7 @@ interface LoadingProps {
     loading: boolean,
 }
 
-export default function LoadingComponent({ loading }: LoadingProps) {
+export default memo(function LoadingComponent({ loading }: LoadingProps) {
     return (
         <Modal
             animationType="fade"
@@ -23,6 +23,6 @@ export default function LoadingComponent({ loading }: LoadingProps) {
             </View>
         </Modal>
     )
-}
+});
 
 const styles = StyleSheet.create({})

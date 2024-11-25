@@ -1,8 +1,7 @@
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react'
+import React, { memo, useState } from 'react'
 import { useModeColor } from '../hooks/ColorMode/UseModeTheme'
 import EyeHidIcon from '../assets/IconComponents/EyeHidIcon';
-import { SIZES } from '../constans/size';
 
 interface InputProps {
     placeholder?: string,
@@ -16,7 +15,7 @@ interface InputProps {
     borderWidth?: number,
 }
 
-export default function InputComponent({ placeholder = 'Enter text', Icon, type, value, onChangeText, onBlur, errorMessage, borderRadius, borderWidth }: InputProps) {
+export default memo(function InputComponent({ placeholder = 'Enter text', Icon, type, onChangeText, onBlur, errorMessage, borderRadius, borderWidth }: InputProps) {
 
     const { textLight, error, darkGrayLight } = useModeColor();
 
@@ -48,7 +47,7 @@ export default function InputComponent({ placeholder = 'Enter text', Icon, type,
             <Text style={[{ color: error }]}>{errorMessage}</Text>
         </View>
     )
-}
+});
 
 const styles = StyleSheet.create({
     container: {

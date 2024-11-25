@@ -19,7 +19,7 @@ const Stack = createStackNavigator();
 const Navigation = () => {
     return (
         <NavigationContainer ref={navigationRef} >
-            <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName='navHome'>
                 <Stack.Screen name='intro' component={Intro} />
                 <Stack.Screen name='login' component={LoginNavigation} />
                 <Stack.Screen name='navHome' component={BottomTabNavigation} />

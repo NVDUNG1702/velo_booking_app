@@ -99,8 +99,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     sliding: {
-        height: 60,
-        width: 60,
+        height: 55,
+        width: 55,
         borderRadius: 50,
         backgroundColor: 'white'
     },

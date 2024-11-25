@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, { memo } from 'react'
 import { useModeColor } from '../hooks/ColorMode/UseModeTheme'
 import { SIZES } from '../constans/size';
 
@@ -11,7 +11,7 @@ interface ButtonProps {
     disabled?: boolean;
 }
 
-export default function ButtonComponent({ label, marginB = 30, marginT = 30, onPress, disabled = false }: ButtonProps) {
+export default memo(function ButtonComponent({ label, marginB = 30, marginT = 30, onPress, disabled = false }: ButtonProps) {
     const { skyBlue, isDarkMode, skyBlueDisabled } = useModeColor();
 
     return (
@@ -32,6 +32,8 @@ export default function ButtonComponent({ label, marginB = 30, marginT = 30, onP
 
     )
 }
+);
+
 
 const styles = StyleSheet.create({
     container: {
