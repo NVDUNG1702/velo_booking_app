@@ -13,6 +13,7 @@ import ButtonComponent from '../../../components/ButtonComponent';
 import useSignin from '../../../hooks/auth/useSignin';
 import { Controller } from 'react-hook-form';
 import LoadingComponent from '../../../components/LoadingComponent';
+import LayoutComponent from '../../../layouts/LayoutComponent';
 
 type PropSignin = {
     navigation: StackNavigationProp<StackParamListLogin, 'signin'>;
@@ -32,69 +33,71 @@ export default function Signin({ navigation }: PropSignin) {
     };
 
     return (
-        <View style={[backgroundStyle, styles.container]}>
-            <LoadingComponent loading={isLoading} />
-            <LogoSVG width={'30%'} height={'20%'} />
-            <View style={[styles.titleContainer]}>
-                <Text style={[{ color: textLight }, styles.title]}>Sign In</Text>
-            </View>
-            <View style={[styles.formInput]}>
-                <Controller
-                    control={control}
-                    name="username"
-                    render={({ field: { onChange, value, onBlur } }) => (
-                        <InputComponent
-                            Icon={UserIcon}
-                            onChangeText={onChange}
-                            value={value}
-                            errorMessage={errors?.username?.message}
-                            placeholder='please enter username or email'
-                            onBlur={onBlur}
-                        />
-                    )}
-                />
-                <Controller
-                    control={control}
-                    name="password"
-                    render={({ field: { onChange, value, onBlur } }) => (
-                        <InputComponent
-                            Icon={LockIcon}
-                            errorMessage={errors?.password?.message}
-                            type='password'
-                            placeholder='please enter password'
-                            onChangeText={onChange}
-                            value={value}
-                            onBlur={onBlur}
-                        />
-                    )}
-                />
+        <LayoutComponent>
+            <View style={[backgroundStyle, styles.container]}>
+                <LoadingComponent loading={isLoading} />
+                <LogoSVG width={'30%'} height={'20%'} />
+                <View style={[styles.titleContainer]}>
+                    <Text style={[{ color: textLight }, styles.title]}>Sign In</Text>
+                </View>
+                <View style={[styles.formInput]}>
+                    <Controller
+                        control={control}
+                        name="username"
+                        render={({ field: { onChange, value, onBlur } }) => (
+                            <InputComponent
+                                Icon={UserIcon}
+                                onChangeText={onChange}
+                                value={value}
+                                errorMessage={errors?.username?.message}
+                                placeholder='please enter username or email'
+                                onBlur={onBlur}
+                            />
+                        )}
+                    />
+                    <Controller
+                        control={control}
+                        name="password"
+                        render={({ field: { onChange, value, onBlur } }) => (
+                            <InputComponent
+                                Icon={LockIcon}
+                                errorMessage={errors?.password?.message}
+                                type='password'
+                                placeholder='please enter password'
+                                onChangeText={onChange}
+                                value={value}
+                                onBlur={onBlur}
+                            />
+                        )}
+                    />
 
-            </View>
-            <View style={[{ width: '90%', marginTop: 10 }, styles.containerRmAndForgot]}>
-                <View style={[styles.containerCheckBox]}>
-                    <CheckBoxComponent checked={remember} setCheck={setRemember} size={20} />
-                    <Text style={[{ color: textLight, marginStart: 10 }]}>Remember me</Text>
                 </View>
-                <View>
-                    <TouchableOpacity
-                        onPress={handleNextForgot}
-                    >
-                        <Text style={{ color: textLight, textDecorationLine: 'underline' }}>
-                            Forgot password
-                        </Text>
-                    </TouchableOpacity>
+                <View style={[{ width: '90%', marginTop: 10 }, styles.containerRmAndForgot]}>
+                    <View style={[styles.containerCheckBox]}>
+                        <CheckBoxComponent checked={remember} setCheck={setRemember} size={20} />
+                        <Text style={[{ color: textLight, marginStart: 10 }]}>Remember me</Text>
+                    </View>
+                    <View>
+                        <TouchableOpacity
+                            onPress={handleNextForgot}
+                        >
+                            <Text style={{ color: textLight, textDecorationLine: 'underline' }}>
+                                Forgot password
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
+                <ButtonComponent label='SIGN IN' marginT={50} onPress={handleSubmit} />
+                <Text style={{ marginTop: 30, color: darkGrayLight }}>
+                    Don’t have an account?
+                </Text>
+                <TouchableOpacity
+                    onPress={handleNextSignUp}
+                >
+                    <Text style={{ color: skyBlue, textDecorationLine: 'underline' }}>Sign up now</Text>
+                </TouchableOpacity>
             </View>
-            <ButtonComponent label='hello' marginT={50} onPress={handleSubmit} />
-            <Text style={{ marginTop: 30, color: darkGrayLight }}>
-                Don’t have an account?
-            </Text>
-            <TouchableOpacity
-                onPress={handleNextSignUp}
-            >
-                <Text style={{ color: skyBlue, textDecorationLine: 'underline' }}>Sign up now</Text>
-            </TouchableOpacity>
-        </View>
+        </LayoutComponent>
     )
 }
 

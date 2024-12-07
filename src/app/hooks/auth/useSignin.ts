@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useEffect, useState } from 'react';
 import { ToastError } from '../../untils/ToastMessage/toast';
-import { authStore } from '../../../stores/auth.store';
+import { authStore } from '../../../stores/auth/auth.store';
 
 const schema = Yup.object().shape({
     username: Yup.string().min(4, "Must be unique and between 4 and 50 characters.").max(50, "Must be unique and between 4 and 50 characters.").required('Please enter your username!'),
@@ -12,7 +12,7 @@ const schema = Yup.object().shape({
 })
 
 export default function useSignin() {
-    const { isError, isLoading, login } = authStore();
+    const { isToast, isLoading, login } = authStore();
     const [remember, setRemember] = useState(false);
     const { control, handleSubmit, formState: { errors }, clearErrors } = useForm<UserLoginForm>({
         resolver: yupResolver(schema),
@@ -23,7 +23,7 @@ export default function useSignin() {
     });
 
     const onSubmit: SubmitHandler<UserLoginForm> = async (data) => {
-        login(data);
+        login({ payload: data, remember });
     }
 
     const handleErrorValid = (errors: FieldErrors<UserLoginForm>) => {
@@ -43,6 +43,12 @@ export default function useSignin() {
             }
         });
     };
+
+    // useEffect(() => {
+    //     if (isToast) {
+    //         ToastError('Login error', isToast)
+    //     }
+    // }, [isToast]);
 
     return {
         remember,

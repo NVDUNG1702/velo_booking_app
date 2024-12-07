@@ -1,21 +1,32 @@
-import { Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React from 'react'
+import { Image, Pressable, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native'
+import React, { useRef } from 'react'
 import { useModeColor } from '../../../../../hooks/ColorMode/UseModeTheme';
 import NotifiIcon from '../../../../../assets/IconComponents/NotifiIcon';
 import { SIZES } from '../../../../../constans/size';
 import LocationIcon from '../../../../../assets/IconComponents/LocationIcon';
+import { useSafeAreaStyle } from '../../../../../hooks/size/usesafeArea';
+import SearchCircleIcon from '../../../../../assets/IconComponents/SearchCircle';
+import { UseTyping } from '../../../../../hooks/typeing/useTypeing';
+import ButtonSearch from '../buttonSearch';
+import Animated, { AnimatedStyle } from 'react-native-reanimated';
 const image = require('../../../../../assets/image/avatar.jpg');
 
-export default function HeaderHome() {
-    const { skyBlue, bg, isDarkMode, textLight, darkGrayLight } = useModeColor();
+interface HeaderHomeProps {
+    styleHidden?: (ViewStyle | AnimatedStyle<ViewStyle>)[];
+}
+
+export default React.memo(function HeaderHome({ styleHidden }: HeaderHomeProps) {
+    const { skyBlue, isDarkMode, textLight, darkGrayLight } = useModeColor();
+    const { PADDING_TOP } = useSafeAreaStyle();
+
     return (
-        <View style={[styles.container]}>
-            <View style={[styles.containerTop]}>
+        <Animated.View style={[stylesHeaderHome.container, { paddingTop: PADDING_TOP }, styleHidden]}>
+            <View style={[stylesHeaderHome.containerTop]}>
                 <View style={{ width: '10%' }} />
-                <View style={[styles.containerImage, { borderColor: textLight, boxShadow: `0 0 5px 2px ${textLight}` }]}>
+                <View style={[stylesHeaderHome.containerImage, { borderColor: textLight, boxShadow: `0 0 5px 2px ${textLight}` }]}>
                     <Image
                         source={image}
-                        style={[styles.image,]}
+                        style={[stylesHeaderHome.image,]}
 
                         resizeMode='cover'
                     />
@@ -26,26 +37,29 @@ export default function HeaderHome() {
                     </TouchableOpacity>
                 </View>
             </View>
-            <View style={{ marginTop: 20, width: '100%', alignItems: 'center' }}>
-                <Text style={[styles.textWelcome, { color: textLight }]}>
+            <View style={{ marginVertical: 20, width: '100%', alignItems: 'center' }}>
+                <Text style={[stylesHeaderHome.textWelcome, { color: textLight }]}>
                     Hello, {' '}
-                    <Text style={[styles.textWelcome, styles.textName, { color: isDarkMode ? skyBlue : "rgb(16, 12, 144)" }]}>
+                    <Text style={[stylesHeaderHome.textWelcome, stylesHeaderHome.textName, { color: isDarkMode ? skyBlue : "rgb(16, 12, 144)" }]}>
                         My friend
                     </Text>
                 </Text>
-                <Text style={[styles.textLocation, { color: darkGrayLight }]}><LocationIcon size={13} />{' '}Your location</Text>
+                <Text style={[stylesHeaderHome.textLocation, { color: darkGrayLight }]}><LocationIcon size={13} />{' '}Your location</Text>
 
             </View>
-        </View>
-    )
-}
 
-const styles = StyleSheet.create({
+            <ButtonSearch />
+        </Animated.View>
+    )
+});
+
+export const stylesHeaderHome = StyleSheet.create({
     container: {
         width: '100%',
         justifyContent: 'center',
         paddingVertical: 10,
         alignItems: 'center',
+        borderRadius: 30,
     },
     containerTop: {
         width: '90%',

@@ -7,7 +7,7 @@ import BottomTabNavigation from './BottomTabNavigation';
 
 export type StackParamListNav = {
     dashboard: undefined,
-    login: undefined,
+    login?: { screen?: string },
     navHome: undefined,
     intro: undefined
 }

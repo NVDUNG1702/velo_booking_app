@@ -5,6 +5,8 @@ import AppIntroSlider from 'react-native-app-intro-slider';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { StackParamListNav } from '../../../navigations/Navigation';
 import { slidesData } from '../../../datas/intro';
+import { setDataStorage } from '../../../untils/localStorage';
+import { SHOW_INTRO } from '../../../constans';
 
 interface ContentProps {
     navigation: StackNavigationProp<StackParamListNav, 'intro'>
@@ -37,7 +39,8 @@ const Contents = ({ navigation }: ContentProps) => {
         return <Text style={{ color: textLight, fontWeight: '500' }}>{label}</Text>
     };
 
-    const handleDone = () => {
+    const handleDone = async () => {
+        await setDataStorage(SHOW_INTRO, '1');
         navigation.navigate('login');
     }
 

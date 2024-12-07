@@ -107,7 +107,7 @@ class AxiosService {
         return this.service.get(endpoint, config);
     }
 
-    post(endpoint: string, payload: any, config?: AxiosRequestConfig<any>) {
+    post(endpoint: string, payload?: any, config?: AxiosRequestConfig<any>) {
         return this.service.post(endpoint, payload, config);
     }
 

@@ -5,17 +5,16 @@ import { useModeColor } from '../hooks/ColorMode/UseModeTheme'
 import { SIZES } from '../constans/size'
 import ButtonComponent from './ButtonComponent'
 import ArrowLongLeft from '../assets/IconComponents/ArrowLongLeftIcon'
+import { modelStore } from '../../stores/model.store'
 
 type OTPModelComponentProps = {
-    visible?: boolean,
     email: string,
-    handleHidModal?: (value: boolean) => void
 }
 
-export default function OTPModelComponent({ visible = false, email = '+8434XXXX714', handleHidModal }: OTPModelComponentProps) {
+export default function OTPModelComponent({ email = '0346477714' }: OTPModelComponentProps) {
     const { backgroundStyle, textLight, skyBlue } = useModeColor();
     const [timeCountDown, setTimeCountDown] = useState(0);
-
+    const { isModel, setModel } = modelStore();
     useEffect(() => {
         if (timeCountDown > 0) {
             setTimeout(() => {
@@ -28,7 +27,7 @@ export default function OTPModelComponent({ visible = false, email = '+8434XXXX7
         <Modal
             animationType="fade"
             transparent={false}
-            visible={visible}
+            visible={isModel}
         >
             <View style={[{ flex: 1, justifyContent: 'center', alignItems: 'center' }, backgroundStyle]}>
                 <Text style={[styles.title, { color: textLight }]}>Verify Email</Text>
@@ -61,7 +60,7 @@ export default function OTPModelComponent({ visible = false, email = '+8434XXXX7
                 <ButtonComponent label='Verify OTP' disabled={timeCountDown <= 0} />
                 <TouchableOpacity
                     onPress={() => {
-                        if (handleHidModal) handleHidModal(false);
+                        setModel(false);
                     }}
                 >
                     <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>

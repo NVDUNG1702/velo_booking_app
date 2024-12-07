@@ -12,7 +12,7 @@ export default function List({ navigation }: ListProps) {
     const { backgroundStyle } = useModeColor();
     return (
         <View style={[backgroundStyle, styles.container]}>
-            <Text>index</Text>
+            <Text style={{fontWeight: '400'}}>index</Text>
         </View>
     )
 }

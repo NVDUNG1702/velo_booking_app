@@ -1,9 +1,16 @@
 
+const img1 = "https://images.pexels.com/photos/220383/pexels-photo-220383.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2";
 
-export const slider = [
+export type typeSlider = {
+    key: number,
+    image: string,
+    title: string
+}
+
+export const slider: typeSlider[] = [
     {
         key: 0,
-        image: "https://images.pexels.com/photos/220383/pexels-photo-220383.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+        image: img1,
         title: "Velo"
     },
     {

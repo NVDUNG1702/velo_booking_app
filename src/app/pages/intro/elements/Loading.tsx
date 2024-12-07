@@ -6,6 +6,9 @@ import LoadingAnimation from '../../../assets/Animation - 1731666331756.json';
 
 export default function Loading() {
     const { skyBlue, deepSeaBlue, backgroundStyle, toggleColorMode } = useModeColor();
+
+    
+
     return (
         <View style={[styles.container, backgroundStyle]}>
             <Text

@@ -1,10 +1,11 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { SIZES } from '../../constans/size';
-import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, withTiming, withSpring } from 'react-native-reanimated';
 import BottomTabIcon from './BottomTabIcon';
 import { useModeColor } from '../../hooks/ColorMode/UseModeTheme';
+import { BlurView } from '@react-native-community/blur';
 
 export default function BottomTabCustomer({ descriptors, state, navigation }: BottomTabBarProps) {
     const MARGIN = 20;
@@ -12,9 +13,14 @@ export default function BottomTabCustomer({ descriptors, state, navigation }: Bo
     const TAB_WIDTH = TAB_BAR_WIDTH / 4;
     state.routes.length;
 
+    const [isPressed, setIsPressed] = useState(false);
+
     const slidingAnimation = useAnimatedStyle(() => {
         return {
-            transform: [{ translateX: withTiming(TAB_WIDTH * state.index) }]
+            transform: [
+                { translateX: withTiming(TAB_WIDTH * state.index) },
+                { scale: withSpring(isPressed ? 0.7 : 1) }
+            ]
         }
     });
 
@@ -26,13 +32,21 @@ export default function BottomTabCustomer({ descriptors, state, navigation }: Bo
             {
                 width: TAB_BAR_WIDTH,
                 bottom: MARGIN,
-                backgroundColor: isDarkMode ? 'black' : '#ffffff',
+                // backgroundColor: isDarkMode ? 'black' : '#ffffff',
                 boxShadow: `1px 1px 5px 1px ${isDarkMode ? 'rgba(0, 0, 0, 1)' : '#d5d5d5'}`
             }
         ]}
         >
+            <View
+                style={{ position: 'absolute', width: '100%', height: '100%', borderRadius: 100, overflow: 'hidden' }}
+            >
+                <BlurView
+                    style={{ width: '100%', height: '100%', borderRadius: 100 }}
+                    blurAmount={15}
+                />
+            </View>
             <Animated.View style={[{ width: TAB_WIDTH }, slidingAnimation, styles.slidingContainer]}>
-                <View style={[styles.sliding, { backgroundColor: isDarkMode ? '#2f2f2f' : '#f6f6f6', boxShadow: `0px 0px 4px 1px ${isDarkMode ? '#868686' : '#d5d5d5'}` }]} />
+                <View style={[styles.sliding, { backgroundColor: isDarkMode ? '#2f2f2f' : '#f6f6f6', boxShadow: `0px 0px 4px 1px ${isDarkMode ? '#868686' : '#d5d5d5'}` },]} />
             </Animated.View>
 
             {
@@ -68,7 +82,17 @@ export default function BottomTabCustomer({ descriptors, state, navigation }: Bo
                             testID={options.tabBarButtonTestID}
                             onPress={onPress}
                             onLongPress={onLongPress}
-                            style={{ flex: 1 }}
+                            onPressIn={() => setIsPressed(true)}
+                            onPressOut={() => setIsPressed(false)}
+                            style={({ pressed }) => {
+                                return [
+                                    {
+                                        flex: 1,
+                                        transform: pressed ? [{ scale: 0.85 }] : [],
+                                        opacity: pressed ? 0.5 : 1
+                                    }
+                                ]
+                            }}
                         >
                             <View style={[styles.contentContainer]}>
                                 <BottomTabIcon route={route.name} focused={isFocused} />
@@ -77,6 +101,7 @@ export default function BottomTabCustomer({ descriptors, state, navigation }: Bo
                     )
                 })
             }
+
         </View>
     )
 }
@@ -86,7 +111,7 @@ const styles = StyleSheet.create({
         flex: 1,
         height: 70,
         flexDirection: 'row',
-        backgroundColor: 'black',
+        backgroundColor: 'transparent',
         position: 'absolute',
         alignSelf: 'center',
         borderRadius: 100,

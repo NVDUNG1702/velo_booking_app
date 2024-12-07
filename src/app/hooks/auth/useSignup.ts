@@ -6,6 +6,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { ToastError, ToastSuccess } from '../../untils/ToastMessage/toast';
 import { signup } from '../../apis/auth/auth.api';
 import { getErrorResponse } from '../../untils/message';
+import { modelStore } from '../../../stores/model.store';
+import { signupStore } from '../../../stores/auth/signup.store';
 
 const schema = Yup.object().shape({
     username: Yup.string().required('Please enter your username!').min(4, "Must be unique and between 4 and 50 characters.").max(50, "Must be unique and between 4 and 50 characters."),
@@ -26,7 +28,8 @@ type StateUseSignup = {
 
 export default function useSignup() {
     const [stateSignUp, setStateSignUp] = useState<StateUseSignup>({ isLoading: false, isError: null });
-    const [visibleOTP, setVisibleOTP] = useState(false);
+    const { isModel, setModel } = modelStore();
+    const { checkDataSignUp } = signupStore();
 
     const { control, handleSubmit, formState: { errors }, getValues, reset } = useForm<UserSignupData>({
         resolver: yupResolver(schema),
@@ -40,17 +43,9 @@ export default function useSignup() {
     });
 
     const onSubmit: SubmitHandler<UserSignupData> = async (data) => {
+        data.phone = data.phone.replace(/^0/, '+84');
         setStateSignUp({ isError: null, isLoading: true });
-        setVisibleOTP(true)
-        try {
-            const response = await signup(data);
-            ToastSuccess("SignUp successful", `Hello ${response.full_name}!`);
-        } catch (error) {
-            ToastError("SignUp error", `${getErrorResponse(error)}`);
-            setStateSignUp({ ...stateSignUp, isError: getErrorResponse(errors) });
-        } finally {
-            setStateSignUp({ isError: null, isLoading: false });
-        }
+        checkDataSignUp(data);
     };
 
     const handleError = (errors: FieldErrors<UserSignupData>) => {
@@ -80,7 +75,7 @@ export default function useSignup() {
         handleSubmit: handleSubmit(onSubmit, handleError),
         errors,
         getValues,
-        visibleOTP,
-        setVisibleOTP
+        isModel,
+        setModel
     }
 }

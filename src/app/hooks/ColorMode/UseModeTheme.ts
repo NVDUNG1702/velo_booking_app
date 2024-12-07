@@ -7,7 +7,7 @@ import { Colors } from "react-native/Libraries/NewAppScreen";
 export const useModeColor = () => {
     const { isMode, setIsMode, initializeMode } = modeThemeStore();
     const isDarkMode = isMode === DARK_MODE;
-    const toggleColorMode = async () => {
+    const toggleColorMode = () => {
         setIsMode();
     }
 

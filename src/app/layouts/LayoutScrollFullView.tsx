@@ -7,6 +7,7 @@ import {
     StyleProp,
 } from 'react-native';
 import { useModeColor } from '../hooks/ColorMode/UseModeTheme';
+import Animated from 'react-native-reanimated';
 
 interface FullScreenScrollViewProps extends ScrollViewProps {
     style?: StyleProp<ViewStyle>; // Style của ScrollView
@@ -21,14 +22,14 @@ const ScrollFullView: React.FC<FullScreenScrollViewProps> = ({
 }) => {
     const { backgroundStyle } = useModeColor();
     return (
-        <ScrollView
-            style={[styles.scrollContainer, style, backgroundStyle]}
+        <Animated.ScrollView
+            style={[styles.scrollContainer, style,]}
             contentContainerStyle={[styles.contentContainer, contentStyle]}
             showsVerticalScrollIndicator={false}
             {...rest} // Truyền thêm các props khác vào ScrollView
         >
             {children}
-        </ScrollView>
+        </Animated.ScrollView>
     );
 };
 

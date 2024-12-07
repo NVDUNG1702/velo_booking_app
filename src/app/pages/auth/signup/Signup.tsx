@@ -18,6 +18,7 @@ import useSignup from '../../../hooks/auth/useSignup'
 import { Controller } from 'react-hook-form'
 import LoadingComponent from '../../../components/LoadingComponent'
 import OTPModelComponent from '../../../components/OTPModelComponent'
+import LayoutComponent from '../../../layouts/LayoutComponent'
 
 interface PropSigup {
   navigation: StackNavigationProp<StackParamListLogin, 'signup'>
@@ -27,7 +28,7 @@ export default function Signup({ navigation }: PropSigup) {
 
   const { backgroundStyle, textLight, darkGrayLight, skyBlue } = useModeColor();
   const { heightSafeArea } = useSafeAreaStyle();
-  const { control, handleSubmit, isLoading, errors, getValues, setVisibleOTP, visibleOTP } = useSignup();
+  const { control, handleSubmit, isLoading, errors } = useSignup();
 
   const handleGoBack = () => {
     navigation.goBack();
@@ -35,117 +36,119 @@ export default function Signup({ navigation }: PropSigup) {
 
 
   return (
-    <View style={[styles.container, backgroundStyle]}>
-      <LoadingComponent loading={isLoading} />
-      <OTPModelComponent email={getValues().email} visible={visibleOTP} handleHidModal={setVisibleOTP} />
-      <HeaderComponent navigation={navigation} />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={{ width: '100%', height: heightSafeArea * 0.95 }}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={[styles.containerContent, { minHeight: heightSafeArea * 0.80 }]}>
-          <LogoSVG width={'25%'} height={'10%'} />
-          <View style={[styles.titleContainer]}>
-            <Text style={[{ color: textLight }, styles.title]}>Sign Up</Text>
+    <LayoutComponent>
+      <View style={[styles.container, backgroundStyle]}>
+        <LoadingComponent loading={isLoading} />
+        {/* <OTPModelComponent email={getValues().email} /> */}
+        <HeaderComponent navigation={navigation} />
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          style={{ width: '100%', height: heightSafeArea * 0.95 }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={[styles.containerContent, { minHeight: heightSafeArea * 0.80 }]}>
+            <LogoSVG width={'25%'} height={'10%'} />
+            <View style={[styles.titleContainer]}>
+              <Text style={[{ color: textLight }, styles.title]}>Sign Up</Text>
+            </View>
+            <View style={[styles.formContainer]}>
+              <Controller
+                control={control}
+                name="username"
+                render={({ field: { onChange, value, onBlur } }) => (
+                  <InputComponent
+                    Icon={UserIcon}
+                    onChangeText={onChange}
+                    value={value}
+                    errorMessage={errors?.username?.message}
+                    placeholder="Enter user name"
+                    onBlur={onBlur}
+                  />
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="email"
+                render={({ field: { onChange, value, onBlur } }) => (
+                  <InputComponent
+                    Icon={EmailIcon}
+                    onChangeText={onChange}
+                    value={value}
+                    errorMessage={errors?.email?.message}
+                    placeholder="Enter your mail"
+                    onBlur={onBlur}
+                  />
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="phone"
+                render={({ field: { onChange, value, onBlur } }) => (
+                  <InputComponent
+                    Icon={PhoneIcon}
+                    onChangeText={onChange}
+                    value={value}
+                    errorMessage={errors?.phone?.message}
+                    placeholder="Enter your phone number"
+                    onBlur={onBlur}
+                  />
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="full_name"
+                render={({ field: { onChange, value, onBlur } }) => (
+                  <InputComponent
+                    Icon={InfoIcon}
+                    onChangeText={onChange}
+                    value={value}
+                    errorMessage={errors?.full_name?.message}
+                    placeholder="Enter your full name"
+                    onBlur={onBlur}
+                  />
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="password"
+                render={({ field: { onChange, value, onBlur } }) => (
+                  <InputComponent
+                    Icon={LockIcon}
+                    onChangeText={onChange}
+                    value={value}
+                    errorMessage={errors?.password?.message}
+                    placeholder="Enter your password"
+                    onBlur={onBlur}
+                    type="password"
+                  />
+                )}
+              />
+
+            </View>
+            <ButtonComponent
+              label='hello'
+              marginT={10}
+              marginB={5}
+              onPress={handleSubmit}
+            />
+            <Text style={{ marginTop: 30, color: darkGrayLight }}>
+              Your have an account?
+            </Text>
+            <TouchableOpacity
+              onPress={handleGoBack}
+              style={{ marginBottom: 55 }}
+            >
+              <Text style={{ color: skyBlue, textDecorationLine: 'underline' }}>Sign in now</Text>
+            </TouchableOpacity>
           </View>
-          <View style={[styles.formContainer]}>
-            <Controller
-              control={control}
-              name="username"
-              render={({ field: { onChange, value, onBlur } }) => (
-                <InputComponent
-                  Icon={UserIcon}
-                  onChangeText={onChange}
-                  value={value}
-                  errorMessage={errors?.username?.message}
-                  placeholder="Enter user name"
-                  onBlur={onBlur}
-                />
-              )}
-            />
-
-            <Controller
-              control={control}
-              name="email"
-              render={({ field: { onChange, value, onBlur } }) => (
-                <InputComponent
-                  Icon={EmailIcon}
-                  onChangeText={onChange}
-                  value={value}
-                  errorMessage={errors?.email?.message}
-                  placeholder="Enter your mail"
-                  onBlur={onBlur}
-                />
-              )}
-            />
-
-            <Controller
-              control={control}
-              name="phone"
-              render={({ field: { onChange, value, onBlur } }) => (
-                <InputComponent
-                  Icon={PhoneIcon}
-                  onChangeText={onChange}
-                  value={value}
-                  errorMessage={errors?.phone?.message}
-                  placeholder="Enter your phone number"
-                  onBlur={onBlur}
-                />
-              )}
-            />
-
-            <Controller
-              control={control}
-              name="full_name"
-              render={({ field: { onChange, value, onBlur } }) => (
-                <InputComponent
-                  Icon={InfoIcon}
-                  onChangeText={onChange}
-                  value={value}
-                  errorMessage={errors?.full_name?.message}
-                  placeholder="Enter your full name"
-                  onBlur={onBlur}
-                />
-              )}
-            />
-
-            <Controller
-              control={control}
-              name="password"
-              render={({ field: { onChange, value, onBlur } }) => (
-                <InputComponent
-                  Icon={LockIcon}
-                  onChangeText={onChange}
-                  value={value}
-                  errorMessage={errors?.password?.message}
-                  placeholder="Enter your password"
-                  onBlur={onBlur}
-                  type="password"
-                />
-              )}
-            />
-
-          </View>
-          <ButtonComponent
-            label='hello'
-            marginT={10}
-            marginB={5}
-            onPress={handleSubmit}
-          />
-          <Text style={{ marginTop: 30, color: darkGrayLight }}>
-            Your have an account?
-          </Text>
-          <TouchableOpacity
-            onPress={handleGoBack}
-            style={{ marginBottom: 55 }}
-          >
-            <Text style={{ color: skyBlue, textDecorationLine: 'underline' }}>Sign in now</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </View>
+        </ScrollView>
+      </View>
+    </LayoutComponent>
   )
 }
 

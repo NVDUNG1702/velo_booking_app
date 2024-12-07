@@ -1,5 +1,5 @@
 
 export const getErrorResponse = (error: any): string => {
-    const errMessage = error?.data?.message || 'unknown error!'
+    const errMessage = error?.response?.data?.message || 'unknown error!'
     return errMessage;
 };

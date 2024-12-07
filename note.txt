@@ -1,0 +1,3 @@
+1. log: // log check
+2. npx pod-install ios
+3. cd ios && pod install && cd ..
