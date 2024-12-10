@@ -1,4 +1,4 @@
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, PermissionsAndroid, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Carousel from 'react-native-snap-carousel';
 import { BlurView } from '@react-native-community/blur';
 import ScrollFullView from '../../../layouts/LayoutScrollFullView';
@@ -10,6 +10,7 @@ import LayoutComponent from '../../../layouts/LayoutComponent';
 import Animated, { interpolate, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import NotifiIcon from '../../../assets/IconComponents/NotifiIcon';
 import SearchCircleIcon from '../../../assets/IconComponents/SearchCircle';
+import { useEffect } from 'react';
 const image = require('../../../assets/image/avatar.jpg');
 
 interface HomeProps {

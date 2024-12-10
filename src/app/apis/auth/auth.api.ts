@@ -7,7 +7,7 @@ import { SignUpCheckAccountPayLoad, SignUpPayLoad, SignUpResponse } from '../../
 
 export const login = async (payload: UserLoginPayload): Promise<NonNullable<UserResponse>> => {
     const response = await axios.post(`${BASE_URL}/login`, payload);
-    return response?.data;
+    return response?.data.data;
 }
 
 export const signup = async (payload: SignUpPayLoad): Promise<NonNullable<UserSignupResponse>> => {

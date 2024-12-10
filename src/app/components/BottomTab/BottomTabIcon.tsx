@@ -4,6 +4,7 @@ import HeartIcon from '../../assets/svg/BottomTab/heart.svg'
 import UserIcon from '../../assets/svg/BottomTab/user.svg'
 import ListIcon from '../../assets/svg/BottomTab/list.svg'
 import { useModeColor } from '../../hooks/ColorMode/UseModeTheme'
+import MaptIcon from '../../assets/IconComponents/MapIcon'
 
 interface BottomIconProps {
     route: string,
@@ -29,6 +30,9 @@ export default function BottomTabIcon({ route, focused }: BottomIconProps) {
                 break;
             case "user":
                 return <UserIcon width={sizeIcon} height={sizeIcon} fill={focused ? colorFocused : colorFocusedNull} />
+                break;
+            case "map":
+                return <MaptIcon size={sizeIcon} color={focused ? colorFocused : colorFocusedNull} />
                 break;
             default:
                 break;

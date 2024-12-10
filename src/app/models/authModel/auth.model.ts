@@ -30,6 +30,7 @@ export interface UserDetailModel {
     full_name?: string,
     email?: string,
     phone?: string,
+    avatar?: string
 }
 
 export interface UserResponse extends UserDetailModel {

@@ -28,7 +28,7 @@ export default function Signup({ navigation }: PropSigup) {
 
   const { backgroundStyle, textLight, darkGrayLight, skyBlue } = useModeColor();
   const { heightSafeArea } = useSafeAreaStyle();
-  const { control, handleSubmit, isLoading, errors } = useSignup();
+  const { control, handleSubmit, isLoading, errors, countryCode, setCountryCode } = useSignup();
 
   const handleGoBack = () => {
     navigation.goBack();
@@ -94,6 +94,9 @@ export default function Signup({ navigation }: PropSigup) {
                     errorMessage={errors?.phone?.message}
                     placeholder="Enter your phone number"
                     onBlur={onBlur}
+                    type='phone'
+                    countryCode={countryCode}
+                    setCountryCode={setCountryCode}
                   />
                 )}
               />

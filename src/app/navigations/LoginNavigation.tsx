@@ -7,10 +7,10 @@ import OTPSignUp from '../pages/auth/otp_signup';
 const Stack = createStackNavigator();
 
 export type StackParamListLogin = {
-    signin: undefined,
-    signup: undefined,
-    forgotPass: undefined,
-    optSignUp: undefined
+    signin?: undefined,
+    signup?: undefined,
+    forgotPass?: undefined,
+    optSignUp?: undefined
 };
 
 export default function LoginNavigation() {

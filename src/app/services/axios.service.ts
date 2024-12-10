@@ -22,38 +22,40 @@ class AxiosService {
         service.interceptors.request.use(
             async (config) => {
 
-                if (!this.JWT) await this.initToken();
+                if (!this.JWT || !this.refreshToken) await this.initToken();
 
-                if (!!this.JWT) config.headers.Authorization = `Bearer ${this.JWT}`;
+                if (!this.JWT || !this.refreshToken) return config;
 
-                if (!this.JWT) return config;
-
-                let user: any = jwtDecode(this.JWT);
-                const isExpired = dayjs.unix(user?.exp).diff(dayjs()) < 1;
-
-                if (!isExpired) return config;
-
-
-                if (!this.refreshToken) return config;
-
-                user = jwtDecode(this.refreshToken);
-                const isExpiredRefreshToken = dayjs.unix(user?.exp).diff(dayjs()) < 1;
+                let decodeRefreshToken: any = jwtDecode(this.refreshToken);
+                const isExpiredRefreshToken = dayjs.unix(decodeRefreshToken?.exp).diff(dayjs()) > 1;
 
                 if (!isExpiredRefreshToken) return config;
 
-                let newToken = await getTokenFromRefreshToken(this.refreshToken);
-                if (!newToken) {
-                    await removeDataStorage(ACCESS_TOKEN);
-                    await removeDataStorage(REFRESH_TOKEN);
+                let user: any = jwtDecode(this.JWT);
+                const isExpired = dayjs.unix(user?.exp).diff(dayjs()) > 1;
+
+                if (!isExpired) {
+                    let newToken = await getTokenFromRefreshToken(this.refreshToken, user.id);
+                    if (!newToken) {
+                        await removeDataStorage(ACCESS_TOKEN);
+                        await removeDataStorage(REFRESH_TOKEN);
+                        return config;
+                    }
+
+                    const { refreshToken, accessToken } = newToken.data;
+                    config.headers.set('Authorization', `Bearer ${accessToken}`);
+                    config.headers.set('rf-token', refreshToken);
+                    config.headers.set('x-client-id', user.id);
+                    await setDataStorage(ACCESS_TOKEN, accessToken);
+                    await setDataStorage(REFRESH_TOKEN, refreshToken);
+                    newToken = null;
                     return config;
-                }
+                };
 
-                const { refreshToken, accessToken } = newToken.accessToken;
-                config.headers.Authorization = `Bearer ${accessToken}`;
-                await setDataStorage(ACCESS_TOKEN, accessToken);
-                await setDataStorage(REFRESH_TOKEN, refreshToken);
-
-                newToken = null;
+                config.headers.set('Authorization', `Bearer ${this.JWT}`);
+                config.headers.set('rf-token', this.refreshToken);
+                config.headers.set('x-client-id', user.id);
+                console.log('test');
 
                 return config;
             },
@@ -82,7 +84,7 @@ class AxiosService {
         return response;
     }
 
-    private handleResponseError(error: any) {
+    private async handleResponseError(error: any) {
         const caseToRedirectLogin = ['Invalid token.', 'User Not Found'];
         if (caseToRedirectLogin.includes(error.response?.data?.message)) {
             this.redirectToLogin();
@@ -91,6 +93,31 @@ class AxiosService {
         if (error?.response?.tatus === 401) {
             this.redirectToLogin();
             return;
+        }
+        if (error?.response?.tatus === 403) {
+            await this.initToken();
+            if (!this.JWT || !this.refreshToken) {
+                this.redirectToLogin();
+                return;
+            }
+            let decodeRefreshToken: any = jwtDecode(this.refreshToken);
+            const isExpiredRefreshToken = dayjs.unix(decodeRefreshToken?.exp).diff(dayjs()) > 1;
+
+            if (!isExpiredRefreshToken) return Promise.reject(error);
+            let newToken = await getTokenFromRefreshToken(this.refreshToken, decodeRefreshToken.id);
+            if (!newToken) {
+                await removeDataStorage(ACCESS_TOKEN);
+                await removeDataStorage(REFRESH_TOKEN);
+                return error;
+            }
+
+            const { refreshToken, accessToken } = newToken.data;
+            error.config.headers.set('Authorization', `Bearer ${accessToken}`);
+            error.config.headers.set('rf-token', refreshToken);
+            error.config.headers.set('x-client-id', decodeRefreshToken.id);
+            await setDataStorage(ACCESS_TOKEN, accessToken);
+            await setDataStorage(REFRESH_TOKEN, refreshToken);
+            return this.service.request(error.config)
         }
         return Promise.reject(error);
     }

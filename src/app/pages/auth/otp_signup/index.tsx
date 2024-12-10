@@ -1,22 +1,30 @@
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { useEffect, useState } from 'react'
 import OTP from 'react-native-otp-form'
 import { useModeColor } from '../../../hooks/ColorMode/UseModeTheme';
-import { modelStore } from '../../../../stores/model.store';
 import ButtonComponent from '../../../components/ButtonComponent';
-import ArrowLongLeft from '../../../assets/IconComponents/ArrowLongLeftIcon';
 import { SIZES } from '../../../constans/size';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { StackParamListLogin } from '../../../navigations/LoginNavigation';
+import { signupStore } from '../../../../stores/auth/signup.store';
+import HeaderComponent from '../../../components/HeaderComponent';
+import LayoutComponent from '../../../layouts/LayoutComponent';
+import LottieView from 'lottie-react-native';
+import { ToastError } from '../../../untils/ToastMessage/toast';
+import LoadingComponent from '../../../components/LoadingComponent';
+const animationJson = require('../../../assets/json/sendMail.json');
+
 
 type OTPSignUpProps = {
     navigation: StackNavigationProp<StackParamListLogin, 'optSignUp'>
 }
 
-export default function OTPSignUp({ }: OTPSignUpProps) {
+export default function OTPSignUp({ navigation }: OTPSignUpProps) {
     const { backgroundStyle, textLight, skyBlue } = useModeColor();
-    const [timeCountDown, setTimeCountDown] = useState(0);
-    const { isModel, setModel } = modelStore();
+    const [timeCountDown, setTimeCountDown] = useState(120);
+    const { signup, dataSignUp, checkDataSignUp, isLoading } = signupStore();
+    const [otp, setOtp] = useState('');
+
     useEffect(() => {
         if (timeCountDown > 0) {
             setTimeout(() => {
@@ -25,61 +33,86 @@ export default function OTPSignUp({ }: OTPSignUpProps) {
         }
     }, [timeCountDown]);
 
+    const handleReSendCode = () => {
+        if (!dataSignUp) {
+            ToastError('ReSend Code Error', 'Somethink grong!');
+            navigation.goBack();
+            return;
+        };
+
+        checkDataSignUp(dataSignUp);
+        setTimeCountDown(120);
+    }
+
+    const handleSignup = () => {
+        if (dataSignUp) {
+            signup({ ...dataSignUp, otp });
+        }
+    }
+
+
+
     return (
-        <View style={[{ flex: 1, justifyContent: 'center', alignItems: 'center' }, backgroundStyle]}>
-            <Text style={[styles.title, { color: textLight }]}>Verify Email</Text>
-            <Text style={[styles.content, { color: textLight }]}>Code has been sent to: {''}</Text>
-            <View style={[styles.containerOTP,]}>
-                <OTP
-                    codeCount={4}
-                    containerStyle={styles.otpWrapper}
-                    otpStyles={{ ...styles.otpInput }}
-                    textContentType='telephoneNumber'
+        <LayoutComponent>
+            <LoadingComponent loading={isLoading} />
+            <HeaderComponent navigation={navigation} />
+            <View style={[{ flex: 0.9, alignItems: 'center', justifyContent: 'center' }, backgroundStyle]}>
+
+                <LottieView
+                    source={animationJson}
+                    autoPlay
+                    style={{ width: '100%', height: '30%' }}
                 />
-            </View>
-
-            {
-                timeCountDown > 0 ? (
-                    <>
-                        <Text style={[{ color: textLight }]}>The code will expire after: {timeCountDown}</Text>
-                    </>
-                ) : (
-                    <>
-                        <Text style={[styles.content, { color: textLight }]}>Didn't get OTP code?</Text>
-                        <TouchableOpacity
-                            onPress={() => { setTimeCountDown(5) }}
-                        >
-                            <Text style={[styles.content, { color: skyBlue, textDecorationLine: 'underline' }]}>Resend code</Text>
-                        </TouchableOpacity>
-                    </>
-                )
-            }
-            <ButtonComponent label='Verify OTP' disabled={timeCountDown <= 0} />
-            <TouchableOpacity
-                onPress={() => {
-                    setModel(false);
-                }}
-            >
-                <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                    <ArrowLongLeft size={40} />
-                    <Text style={{ color: textLight }}>BACK</Text>
-                    <View style={{ width: 30, height: 5, borderColor: textLight, borderWidth: 2 }}>
-
+                <View style={{ width: '100%', height: '70%', justifyContent: 'space-evenly', alignItems: 'center' }}>
+                    <Text style={[styles.title, { color: textLight }]}>Verify Email</Text>
+                    <Text style={[styles.content, { color: textLight, marginBottom: 0 }]}>Code has been sent to: </Text>
+                    <Text style={[styles.content, { color: textLight, fontWeight: '600' }]}>{dataSignUp?.email}</Text>
+                    <View style={[styles.containerOTP,]}>
+                        <OTP
+                            codeCount={6}
+                            containerStyle={styles.otpWrapper}
+                            otpStyles={{ ...styles.otpInput }}
+                            textContentType='telephoneNumber'
+                            // onChange={(e) => onChangOtp(e.nativeEvent.text)}
+                            onTyping={setOtp}
+                        />
                     </View>
-                </View>
-            </TouchableOpacity>
 
-        </View>
+                    {
+                        timeCountDown > 0 ? (
+                            <>
+                                <Text style={[{ color: textLight }]}>The code will expire after: {timeCountDown}</Text>
+                            </>
+                        ) : (
+                            <>
+                                <Text style={[styles.content, { color: textLight }]}>Didn't get OTP code?</Text>
+                                <TouchableOpacity
+                                    onPress={handleReSendCode}
+                                >
+                                    <Text style={[styles.content, { color: skyBlue, textDecorationLine: 'underline' }]}>Resend code</Text>
+                                </TouchableOpacity>
+                            </>
+                        )
+                    }
+                    <ButtonComponent
+                        label='Verify OTP'
+                        disabled={timeCountDown <= 0 || otp.length !== 6}
+                        onPress={handleSignup}
+                    />
+                </View>
+
+            </View>
+        </LayoutComponent>
     )
 }
 
 const styles = StyleSheet.create({
     containerOTP: {
-        width: '90%',
-        height: '15%',
+        width: '100%',
+        // height: '15%',
         alignItems: 'center',
-        paddingTop: 20,
         borderRadius: 25,
+        marginBottom: 15
         // backgroundColor: 'black'
 
     },
@@ -95,7 +128,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
         textAlign: "center",
         fontWeight: '600',
-        boxShadow: "2 3 10 1 #bbbbbb",
+        boxShadow: "2 2 10 2 rgba(225, 225, 225, 0.5)",
         color: '#46BEF1'
     },
     title: {

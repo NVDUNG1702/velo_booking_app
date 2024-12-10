@@ -21,7 +21,7 @@ interface RefreshResponse {
     message: string;
     data: Data;
 }
-export const getTokenFromRefreshToken = async (refreshToken: string, clientID: number): Promise<RefreshResponse> => {
+export const getTokenFromRefreshToken = async (refreshToken: string, clientID: number): Promise<RefreshResponse | null> => {
     try {
         const response = await axios.post<RefreshResponse>(`${BASE_URL}/refresh-token`, null, {
             headers: {

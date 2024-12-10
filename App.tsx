@@ -12,7 +12,9 @@ import { useEffect } from 'react';
 import LayoutApp from './src/app/layouts/LayoutApp';
 import { useModeColor } from './src/app/hooks/ColorMode/UseModeTheme';
 import './src/globals/font.global';
-import { Text } from 'react-native';
+
+import MapLibreGL from '@maplibre/maplibre-react-native';
+MapLibreGL.setAccessToken(null);
 
 export const App = () => {
     const { initializeMode } = modeThemeStore();

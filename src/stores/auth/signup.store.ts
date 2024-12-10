@@ -1,16 +1,12 @@
 import { create } from "zustand";
-import { UserLoginPayload } from "../../app/models/authModel/auth.model";
-import { removeDataStorage, setDataStorage } from "../../app/untils/localStorage";
-import { ACCESS_TOKEN, REFRESH_TOKEN, REMEMBER } from "../../app/constans";
 import { navigationRef } from "../../app/navigations/Navigation";
-import { checkDataSignUp, login, loginWithToken, signup } from "../../app/apis/auth/auth.api";
-import { getErrorResponse } from "../../app/untils/message";
+import { checkDataSignUp, signup } from "../../app/apis/auth/auth.api";
 import { ToastError, ToastSuccess } from "../../app/untils/ToastMessage/toast";
 import { SignUpCheckAccountPayLoad, SignUpPayLoad } from "../../app/models/authModel/signup.model";
 
 interface SignUpStoreState {
     isLoading: boolean;
-    dataLogin: SignUpCheckAccountPayLoad | null;
+    dataSignUp: SignUpCheckAccountPayLoad | null;
     checkDataSignUp: (payload: SignUpCheckAccountPayLoad) => void;
     signup: (payload: SignUpPayLoad) => void;
 };
@@ -18,17 +14,22 @@ interface SignUpStoreState {
 export const signupStore = create<SignUpStoreState>()((set) => (
     {
         isLoading: false,
-        dataLogin: null,
+        dataSignUp: null,
 
         checkDataSignUp: async (payload) => {
+            const currentRoute = navigationRef.getCurrentRoute();
             try {
                 set({ isLoading: true });
-                const data = await checkDataSignUp(payload);
-                ToastSuccess('Send OTP', 'Sen OTP success');
-                set({ dataLogin: payload })
-                navigationRef.navigate('login', {
-                    screen: 'otpSignUp'
-                })
+                await checkDataSignUp(payload);
+                const handleSuccess = () => {
+                    set({ dataSignUp: payload })
+                    if (currentRoute?.params?.screen !== 'otpSignUp') {
+                        navigationRef.navigate('login', {
+                            screen: 'otpSignUp'
+                        })
+                    }
+                }
+                ToastSuccess('Send OTP', 'Sen OTP success', 2000, handleSuccess);
             } catch (error: any) {
                 const validMessages = [
                     "Username already exists.",
@@ -50,9 +51,24 @@ export const signupStore = create<SignUpStoreState>()((set) => (
             try {
                 set({ isLoading: true });
                 const data = await signup(payload);
-                
-            } catch (error) {
+                const callBack = () => {
+                    navigationRef.navigate('login', {
+                        screen: 'signin'
+                    });
+                }
+                ToastSuccess('Signup Success', 'You have successfully registered an account!', 2000, callBack);
 
+            } catch (error: any) {
+                const validMessages = ['Invalid OTP!', 'OTP expired or not found']
+                navigationRef.goBack();
+                const { message } = error?.response?.data;
+                if (message && validMessages.includes(message)) {
+                    ToastError('SignUp Error', 'OTP expired or not found!')
+                } else {
+                    ToastError('SignUp Error', 'Something wrong!')
+                }
+            } finally {
+                set({ isLoading: false });
             }
         }
 

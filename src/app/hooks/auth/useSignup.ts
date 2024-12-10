@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FieldErrors, SubmitHandler, useForm } from 'react-hook-form';
 import { UserSignupData } from '../../models/authModel/auth.model';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -21,31 +21,25 @@ const schema = Yup.object().shape({
     // )
 });
 
-type StateUseSignup = {
-    isLoading: boolean,
-    isError: string | null
-}
-
 export default function useSignup() {
-    const [stateSignUp, setStateSignUp] = useState<StateUseSignup>({ isLoading: false, isError: null });
-    const { isModel, setModel } = modelStore();
-    const { checkDataSignUp } = signupStore();
+    const { checkDataSignUp, isLoading } = signupStore();
+    const [countryCode, setCountryCode] = useState('+84');
 
     const { control, handleSubmit, formState: { errors }, getValues, reset } = useForm<UserSignupData>({
         resolver: yupResolver(schema),
         defaultValues: {
-            email: '',
-            full_name: '',
-            password: '',
-            phone: '',
-            username: ''
+            email: 'duynguyen210420@gmail.com',
+            full_name: 'vandung',
+            password: 'dung1306',
+            phone: '0346477717',
+            username: 'dung1306'
         }
     });
 
     const onSubmit: SubmitHandler<UserSignupData> = async (data) => {
-        data.phone = data.phone.replace(/^0/, '+84');
-        setStateSignUp({ isError: null, isLoading: true });
+        data.phone = data.phone.replace(/^0/, countryCode);
         checkDataSignUp(data);
+        reset();
     };
 
     const handleError = (errors: FieldErrors<UserSignupData>) => {
@@ -70,12 +64,12 @@ export default function useSignup() {
     };
 
     return {
-        isLoading: stateSignUp.isLoading,
+        isLoading: isLoading,
         control,
         handleSubmit: handleSubmit(onSubmit, handleError),
         errors,
         getValues,
-        isModel,
-        setModel
+        countryCode,
+        setCountryCode
     }
 }

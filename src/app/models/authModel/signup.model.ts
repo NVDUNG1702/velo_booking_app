@@ -15,3 +15,5 @@ export interface SignUpResponse {
     message: string;
     data: string;
 }
+
+export interface UserFormUpdate extends SignUpCheckAccountPayLoad {}

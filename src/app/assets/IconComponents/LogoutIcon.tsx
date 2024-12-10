@@ -8,6 +8,6 @@ interface PropIcon {
 }
 
 export default function LogoutIcon({ size = SIZES.icon25, color }: PropIcon) {
-    const { isDarkMode } = useModeColor();
-    return <Icon fill={color || isDarkMode ? '#ffff' : "#363853"} width={size} height={size} />
+    const { textLight } = useModeColor();
+    return <Icon fill={color || textLight} width={size} height={size} />
 }

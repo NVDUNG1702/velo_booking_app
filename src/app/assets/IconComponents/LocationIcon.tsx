@@ -1,4 +1,3 @@
-import React from 'react'
 import IconLocation from '../svg/location.svg';
 import { useModeColor } from '../../hooks/ColorMode/UseModeTheme';
 import { SIZES } from '../../constans/size';

@@ -4,22 +4,32 @@ Toast.show({
 
 })
 
-export const ToastSuccess = (title: string, message: string) => {
+export const ToastSuccess = (title: string, message: string, time?: number, callBack?: () => void) => {
     Toast.show({
         type: 'success',
         text1: title || '',
         text2: message || '',
         topOffset: 55,
-        visibilityTime: 2000
+        visibilityTime: time || 2000,
+        onHide: () => {
+            if (callBack) {
+                callBack();
+            }
+        }
     })
 }
 
-export const ToastError = (title: string, message: string) => {
+export const ToastError = (title: string, message: string, callBack?: () => {}) => {
     Toast.show({
         type: 'error',
         text1: title || '',
         text2: message || '',
         topOffset: 55,
-        visibilityTime: 2000
+        visibilityTime: 2000,
+        onHide: () => {
+            if (callBack) {
+                callBack();
+            }
+        }
     })
 }

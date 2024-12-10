@@ -10,7 +10,7 @@ import { BlurView } from '@react-native-community/blur';
 export default function BottomTabCustomer({ descriptors, state, navigation }: BottomTabBarProps) {
     const MARGIN = 20;
     const TAB_BAR_WIDTH = SIZES.W - (2 * MARGIN);
-    const TAB_WIDTH = TAB_BAR_WIDTH / 4;
+    const TAB_WIDTH = TAB_BAR_WIDTH / 5;
     state.routes.length;
 
     const [isPressed, setIsPressed] = useState(false);
