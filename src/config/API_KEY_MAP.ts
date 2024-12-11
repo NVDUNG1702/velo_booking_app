@@ -1,0 +1,1 @@
+export const API_KEY_MAP = process.env.API_KEY_MAP || ''

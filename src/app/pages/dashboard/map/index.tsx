@@ -1,16 +1,34 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, PermissionsAndroid, Platform, Alert } from 'react-native';
+import { View, Text, StyleSheet, PermissionsAndroid, Platform, Alert, Button } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
 import MapboxGL from '@maplibre/maplibre-react-native';
 import LocationIcon from '../../../assets/IconComponents/LocationIcon';
 import { useModeColor } from '../../../hooks/ColorMode/UseModeTheme';
+import YourLocationIcon from '../../../assets/IconComponents/YourLocationIcon';
+import { API_KEY_MAP } from '../../../../config/API_KEY_MAP';
 
-MapboxGL.setAccessToken(null); // Không cần API key với MapLibre
 
-const MapScreen: React.FC = () => {
+
+
+const MAP_THEME = {
+    DARK: `https://tiles.goong.io/assets/goong_map_dark.json?api_key=${API_KEY_MAP}`,
+    LIGHT: `https://tiles.goong.io/assets/goong_map_web.json?api_key=${API_KEY_MAP}`,
+}
+
+export const Map = () => {
     const [currentLocation, setCurrentLocation] = useState<[number, number] | null>(null);
-    const camera = useRef(null);
-    const { skyBlue } = useModeColor();
+    const [zoomLevel, setZoomLevel] = useState(14);
+    const cameraRef = useRef<MapboxGL.CameraRef | null>(null);
+    const { isDarkMode, skyBlue } = useModeColor();
+    const mapStyle = isDarkMode ? MAP_THEME.DARK : MAP_THEME.LIGHT;
+
+    const zoomIn = () => {
+        setZoomLevel(zoomLevel + 1);
+    };
+
+    const zoomOut = () => {
+        setZoomLevel(zoomLevel - 1);
+    };
     const requestLocationPermission = async () => {
         if (Platform.OS === 'android') {
             const granted = await PermissionsAndroid.request(
@@ -20,7 +38,6 @@ const MapScreen: React.FC = () => {
         }
         return true;
     };
-
 
     const getCurrentLocation = () => {
         Geolocation.getCurrentPosition(
@@ -54,24 +71,30 @@ const MapScreen: React.FC = () => {
     return (
         <View style={styles.container}>
             {currentLocation ? (
-                <MapboxGL.MapView
-                    style={styles.map}
-                    styleURL={`https://tiles.goong.io/assets/goong_satellite.json?api_key=BWMkPYP6VIFnzqmqyOhZM5ZXmznyq6cSs5WE4ZUP`}
-                    zoomEnabled={true}
-                    logoEnabled={true}
-                >
-                    <MapboxGL.Camera
-                        ref={camera}
-                        zoomLevel={17}
-                        centerCoordinate={currentLocation}
-                    />
-                    <MapboxGL.PointAnnotation
-                        id="currentLocation"
-                        coordinate={currentLocation}
+                <>
+                    <MapboxGL.MapView
+                        style={styles.map}
+                        styleURL={mapStyle}
+                        zoomEnabled={true}
+                        logoEnabled={false}
+                        scrollEnabled={true}
+                        pitchEnabled={true}
+                        rotateEnabled={true}
                     >
-                        <LocationIcon color={skyBlue} />
-                    </MapboxGL.PointAnnotation>
-                </MapboxGL.MapView>
+                        <MapboxGL.Camera
+                            ref={cameraRef}
+                            zoomLevel={zoomLevel}
+                            centerCoordinate={currentLocation}
+                        />
+                    </MapboxGL.MapView>
+                    <View style={styles.controls}>
+                        <View>
+                            <YourLocationIcon color={skyBlue} />
+                        </View>
+                        <Button title="+" onPress={zoomIn} />
+                        <Button title="-" onPress={zoomOut} />
+                    </View>
+                </>
             ) : (
                 <View style={styles.loading}>
                     <Text>Đang tải bản đồ...</Text>
@@ -81,8 +104,6 @@ const MapScreen: React.FC = () => {
     );
 };
 
-export default MapScreen;
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -90,15 +111,16 @@ const styles = StyleSheet.create({
     map: {
         flex: 1,
     },
-    marker: {
-        width: 20,
-        height: 20,
-        backgroundColor: '#ff0000',
-        borderRadius: 10,
-    },
     loading: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    controls: {
+        position: 'absolute',
+        bottom: 100,
+        right: 20,
+        flexDirection: 'column',
+        justifyContent: 'space-between',
     },
 });

@@ -1,4 +1,7 @@
 # Resolve react_native_pods.rb with node to allow for hoisting
+require_relative '../node_modules/react-native/scripts/react_native_pods'
+require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
+
 require Pod::Executable.execute_command('node', ['-p',
   'require.resolve(
     "react-native/scripts/react_native_pods.rb",
@@ -16,6 +19,15 @@ end
 
 target 'velo_booking_app' do
   config = use_native_modules!
+  
+  $RCTMLN_Use_SPM = {
+    url: "https://github.com/maplibre/maplibre-gl-native-distribution",
+    requirement: {
+      kind: "upToNextMajorVersion",
+      minimumVersion: "6.4.0"
+    },
+    product_name: "MapLibre"
+  }
 
   use_react_native!(
     :path => config[:reactNativePath],
@@ -36,5 +48,6 @@ target 'velo_booking_app' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+    $RCTMLN.post_install(installer)
   end
 end
