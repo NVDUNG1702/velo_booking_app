@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 Toast.show({
@@ -9,7 +10,7 @@ export const ToastSuccess = (title: string, message: string, time?: number, call
         type: 'success',
         text1: title || '',
         text2: message || '',
-        topOffset: 55,
+        topOffset: Platform.OS === 'android' ? 0 : 55,
         visibilityTime: time || 2000,
         onHide: () => {
             if (callBack) {

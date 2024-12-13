@@ -1,5 +1,4 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React from 'react';
 import LogoSVG from '../../../assets/svg/Logo.svg';
 import { useModeColor } from '../../../hooks/ColorMode/UseModeTheme';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -103,8 +102,7 @@ export default function Signin({ navigation }: PropSignin) {
 
 const styles = StyleSheet.create({
     container: {
-        width: '100%',
-        height: '100%',
+        flex: 1,
         display: 'flex',
         alignItems: 'center',
     },

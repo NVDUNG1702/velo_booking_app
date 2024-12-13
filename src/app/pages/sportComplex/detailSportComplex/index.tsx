@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
     View,
     Text,
@@ -22,6 +22,14 @@ import PhoneIcon from '../../../assets/IconComponents/PhoneIcon';
 import HeartIcon from '../../../assets/IconComponents/IconHeart';
 import LayoutComponent from '../../../layouts/LayoutComponent';
 import ScrollFullView from '../../../layouts/LayoutScrollFullView';
+import { COLORS } from '../../../constans/color';
+
+const imageList = [
+    'https://images.pexels.com/photos/5767580/pexels-photo-5767580.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+    'https://images.pexels.com/photos/3660204/pexels-photo-3660204.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+    'https://images.pexels.com/photos/2202685/pexels-photo-2202685.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+    'https://images.pexels.com/photos/248797/pexels-photo-248797.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+];
 
 interface DetailSportComplexProps {
     route: RouteProp<StackParamListNav, 'detailSportComplex'>;
@@ -31,7 +39,10 @@ interface DetailSportComplexProps {
 const DetailSportComplex: React.FC<DetailSportComplexProps> = ({ route, navigation }) => {
     const { data } = route.params;
     const [isTab, setTab] = useState(1);
-    const { isDarkMode, skyBlue, textLight } = useModeColor();
+    const { isDarkMode, skyBlue, textLight, backgroundStyle } = useModeColor();
+
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const flatListRef = useRef<FlatList>(null);
 
     const handleNavigation = () => {
         if (data.url_sport_complex[0]) {
@@ -45,40 +56,61 @@ const DetailSportComplex: React.FC<DetailSportComplexProps> = ({ route, navigati
         })
     }
 
+    useEffect(() => {
+        const timer = setInterval(() => {
+            const nextIndex = (currentIndex + 1) % imageList.length;
+            setCurrentIndex(nextIndex);
+            flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
+        }, 4000);
+        return () => clearInterval(timer);
+    }, [currentIndex]);
+
+
     return (
-        <LayoutComponent >
-            <ScrollView >
-                {/* Banner Section */}
+        <LayoutComponent fullView>
+            {/* Banner Section */}
+            <ScrollView style={[styles.container, backgroundStyle]}>
                 <View style={styles.bannerContainer}>
-                    <Image
-                        source={{
-                            uri: 'https://images.pexels.com/photos/5767580/pexels-photo-5767580.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2', // Placeholder for no image
-                        }}
-                        style={styles.bannerImage}
+                    <FlatList
+                        data={imageList}
+                        ref={flatListRef}
+                        keyExtractor={(_, index) => index.toString()}
+                        horizontal
+                        pagingEnabled
+                        showsHorizontalScrollIndicator={false}
+                        renderItem={({ item }) => (
+                            <Image source={{ uri: item }} style={styles.bannerImage} resizeMode="cover" />
+                        )}
+                        style={{ width: '100%', height: '100%' }}
+                        // style={{ width: '100%', height: '100%' }}
+                        // contentContainerStyle={{ width: '100%' }}
                     />
                     <TouchableOpacity
                         style={styles.backButton}
                         onPress={() => navigation.goBack()}
                     >
-                        <ArrowLeftIcon />
+                        <ArrowLeftIcon color={COLORS.white} />
                     </TouchableOpacity>
                 </View>
 
-                {/* Avatar and Title Section */}
-                <View style={styles.header}>
-                    <Image
-                        source={{
-                            uri: 'https://images.pexels.com/photos/5767580/pexels-photo-5767580.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2', // Placeholder for no avatar
-                        }}
-                        style={styles.avatar}
-                    />
-                    <View style={styles.headerContent}>
-                        <Text style={styles.title}>{data.name}</Text>
-                        <View style={styles.ratingContainer}>
-                            <StarRating rating={parseFloat(data.evaluation_sport)} />
-                            <Text style={styles.rating}>{data.evaluation_sport}</Text>
+                <View style={[{ backgroundColor: isDarkMode ? 'black' : 'white' }]}>
+                    {/* Avatar and Title Section */}
+                    <View style={[styles.header]}>
+                        <Image
+                            source={{
+                                uri: 'https://images.pexels.com/photos/5767580/pexels-photo-5767580.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2', // Placeholder for no avatar
+                            }}
+                            style={[styles.avatar, { borderColor: isDarkMode ? 'black' : 'white' }]}
+                        />
+                        <View style={styles.headerContent}>
+                            <Text style={[styles.title, { color: textLight }]}>{data.name}</Text>
+                            <View style={styles.ratingContainer}>
+                                <StarRating rating={parseFloat(data.evaluation_sport)} />
+                                <Text style={styles.rating}>{data.evaluation_sport}</Text>
+                            </View>
+                            <Text style={styles.description}>{data.description}</Text>
                         </View>
-                        <Text style={styles.description}>{data.description}</Text>
+
                     </View>
                     <View style={[styles.containerButton]}>
                         <TouchableOpacity style={[styles.bookButton, { backgroundColor: '#ff9393' }]}>
@@ -91,70 +123,75 @@ const DetailSportComplex: React.FC<DetailSportComplexProps> = ({ route, navigati
                             <Text style={styles.bookButtonText}>Đặt sân</Text>
                         </TouchableOpacity>
                     </View>
-                </View>
 
-                {/* Tabs Section (Placeholder for Navigation) */}
-                <FlatList
-                    data={tabs}
-                    renderItem={({ item }) => {
-                        return (
+                    {/* Tabs Section (Placeholder for Navigation) */}
+                    <FlatList
+                        data={tabs}
+                        renderItem={({ item }) => (
                             <TouchableOpacity
+                                key={item.id.toString()}
                                 style={[
+
                                     styles.tab,
-                                    isTab === item.id ? styles.tabActive : {},
+                                    {
+                                        backgroundColor: isDarkMode ? '#5d5d5d' : COLORS.white,
+                                    },
+                                    isTab === item.id && styles.tabActive,
                                 ]}
                                 onPress={() => setTab(item.id)}
                             >
                                 <Text
                                     style={[
                                         styles.tabText,
-                                        isTab === item.id ? styles.tabTextActive : {},
+                                        {
+                                            color: isDarkMode ? COLORS.white : COLORS.black
+                                        },
+                                        isTab === item.id && styles.tabTextActive,
                                     ]}
                                 >
                                     {item.label}
                                 </Text>
                             </TouchableOpacity>
-                        );
-                    }}
-                    style={styles.tabs}
-                    keyExtractor={(item) => item.id.toString()}
-                    horizontal
-                    showsHorizontalScrollIndicator={false} // Ẩn thanh cuộn ngang
-                    contentContainerStyle={{ flexGrow: 1, justifyContent: 'space-between', gap: 10 }} // Đảm bảo các tab được bố trí đều nhau
-                />
+                        )}
+                        style={styles.tabs}
+                        keyExtractor={(item) => item.id.toString()}
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={{ justifyContent: 'space-between' }}
+                    />
+                </View>
+
                 {/* Detail Section */}
-                {
-                    isTab === 1 && (
-                        <View style={styles.details}>
-                            <View style={styles.detailRow}>
-                                <LocationIcon color={skyBlue} />
-                                <Text style={styles.detailText}>{data.location}</Text>
-                            </View>
-                            <View style={styles.detailRow}>
-                                <TimeIcon color={skyBlue} />
-                                <Text style={styles.detailText}>
-                                    T2-CN: Sáng: {data.opening_time} - Chiều: {data.closing_time}
-                                </Text>
-                            </View>
-                            <TouchableOpacity style={styles.detailRow} onPress={handleNavigation}>
-                                <DirectionIcon color={skyBlue} size={SIZES.icon35} />
-                                <Text style={[styles.detailText, { textDecorationLine: 'underline' }]}>
-                                    Hướng dẫn đường đi
-                                </Text>
-                            </TouchableOpacity>
-                            <View style={styles.detailRow}>
-                                <PhoneIcon color={skyBlue} />
-                                <Text style={styles.detailText}>{data.phone[0]}</Text>
-                            </View>
-                            <View style={styles.detailRow}>
-                                {/* <Ionicons name="document-text-outline" size={20} color="#46BEF1" /> */}
-                                <Text style={styles.detailText}>
-                                    Mô tả: {data.description || 'Không có mô tả nào!'}
-                                </Text>
-                            </View>
+                {isTab === 1 && (
+                    <View style={[styles.details, { backgroundColor: isDarkMode ? COLORS.black : COLORS.white }]}>
+                        <View style={styles.detailRow}>
+                            <LocationIcon color={skyBlue} />
+                            <Text style={[styles.detailText, { color: textLight }]}>{data.location}</Text>
                         </View>
-                    )
-                }
+                        <View style={styles.detailRow}>
+                            <TimeIcon color={skyBlue} />
+                            <Text style={[styles.detailText, { color: textLight }]}>
+                                T2-CN: Sáng {data.opening_time} - Chiều {data.closing_time}
+                            </Text>
+                        </View>
+                        <TouchableOpacity style={styles.detailRow} onPress={handleNavigation}>
+                            <DirectionIcon color={skyBlue} size={30} />
+                            <Text style={[styles.detailText, styles.linkText, { color: skyBlue }]}>
+                                Hướng dẫn đường đi
+                            </Text>
+                        </TouchableOpacity>
+                        <View style={styles.detailRow}>
+                            <PhoneIcon color={skyBlue} />
+                            <Text style={[styles.detailText, { color: textLight }]}>{data.phone[0]}</Text>
+                        </View>
+                        <View style={styles.detailRow}>
+                            <Text style={[styles.detailText, { color: textLight }]}>
+                                Mô tả: {data.description || 'Không có mô tả nào!'}
+                            </Text>
+                        </View>
+                    </View>
+                )}
+
             </ScrollView>
         </LayoutComponent >
     );
@@ -162,48 +199,49 @@ const DetailSportComplex: React.FC<DetailSportComplexProps> = ({ route, navigati
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: '#f9f9f9',
+        // flex: 1,
+        width: '100%'
     },
     bannerContainer: {
-        position: 'relative',
-    },
-    bannerImage: {
         width: '100%',
         height: 200,
+        // position: 'relative',
+    },
+    bannerImage: {
+        width: SIZES.W,
+        height: 200
     },
     backButton: {
         position: 'absolute',
-        top: 30,
-        left: 20,
+        top: 40,
+        left: 10,
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
         padding: 8,
         borderRadius: 20,
     },
     header: {
         alignItems: 'center',
-        padding: 20,
-        backgroundColor: '#fff',
-        marginTop: -50,
-        borderRadius: 10,
-        marginHorizontal: 20,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowRadius: 5,
-        elevation: 5,
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        // height: 120
     },
     avatar: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
+        width: 120,
+        height: 120,
+        borderRadius: 60,
         marginBottom: 10,
+        borderWidth: 4,
+        borderColor: COLORS.white,
+        marginTop: -60
     },
     headerContent: {
-        alignItems: 'center',
-        marginBottom: 10,
+        alignItems: 'flex-start',
+        width: '55%',
+        justifyContent: 'center',
+        paddingTop: 10
     },
     title: {
-        fontSize: 18,
+        fontSize: SIZES.h4,
         fontWeight: 'bold',
         marginBottom: 5,
     },
@@ -218,9 +256,9 @@ const styles = StyleSheet.create({
         color: '#FFD700',
     },
     description: {
-        fontSize: 14,
+        fontSize: SIZES.h6,
         color: '#666',
-        textAlign: 'center',
+        // textAlign: 'center',
         marginVertical: 5,
     },
     bookButton: {
@@ -229,7 +267,7 @@ const styles = StyleSheet.create({
         width: '20%',
         justifyContent: 'center',
         alignItems: 'center',
-        height: 40
+        height: 30
     },
     bookButtonText: {
         color: '#fff',
@@ -239,25 +277,29 @@ const styles = StyleSheet.create({
     tabs: {
         flexDirection: 'row',
         width: '100%',
-        borderBottomWidth: 1,
-        borderBottomColor: '#ccc',
-        marginVertical: 10,
+        paddingVertical: 10,
     },
     tab: {
-        paddingVertical: 10,
-        paddingHorizontal: 5,
+        paddingVertical: 12,
+        paddingHorizontal: 15,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        borderRadius: 5,
+        marginHorizontal: 5,
     },
     tabText: {
         color: '#666',
         fontSize: 14,
+        fontWeight: '500',
     },
     tabActive: {
+        backgroundColor: '#46BEF1',
         borderBottomWidth: 2,
         borderBottomColor: '#46BEF1',
-        paddingVertical: 10,
     },
     tabTextActive: {
-        color: '#46BEF1',
+        color: '#fff',
         fontSize: 14,
         fontWeight: 'bold',
     },
@@ -270,6 +312,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 5,
         elevation: 5,
+        minHeight: 150,
     },
     detailRow: {
         flexDirection: 'row',
@@ -281,11 +324,17 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#333',
     },
+    linkText: {
+        textDecorationLine: 'underline',
+        color: '#007BFF',
+    },
     containerButton: {
-        width: '90%',
+        width: '100%',
         justifyContent: 'space-between',
         flexDirection: 'row',
-        alignItems: 'center'
+        alignItems: 'center',
+        paddingBottom: 10,
+        paddingHorizontal: 20
     }
 });
 

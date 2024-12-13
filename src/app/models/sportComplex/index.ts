@@ -19,6 +19,7 @@ export interface SportComplex {
     avatar_image: string;
     banner_images: string[];
     status_sport_complex: string;
+    marker: string;
     created_at: string;
     updated_at: string;
 }

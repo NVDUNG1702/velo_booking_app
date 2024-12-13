@@ -36,7 +36,7 @@ export default function Intro({ navigation }: Props) {
         }
         setTimeout(() => {
             login()
-        }, 2000)
+        }, 5000)
     }, []);
 
     return (

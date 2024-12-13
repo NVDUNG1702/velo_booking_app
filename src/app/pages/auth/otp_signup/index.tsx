@@ -35,7 +35,7 @@ export default function OTPSignUp({ navigation }: OTPSignUpProps) {
 
     const handleReSendCode = () => {
         if (!dataSignUp) {
-            ToastError('ReSend Code Error', 'Somethink grong!');
+            ToastError('ReSend Code Error', 'Somethink wrong!');
             navigation.goBack();
             return;
         };

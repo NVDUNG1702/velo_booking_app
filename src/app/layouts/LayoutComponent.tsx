@@ -1,76 +1,79 @@
-import { ImageBackground, ImageURISource, Platform, SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
-import { useModeColor } from '../hooks/ColorMode/UseModeTheme';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
 import React from 'react';
-import Toast from 'react-native-toast-message';
+import {
+    View,
+    SafeAreaView,
+    StatusBar,
+    StyleSheet,
+    ViewStyle,
+} from 'react-native';
+import Toast, { BaseToastProps, ToastConfig } from 'react-native-toast-message';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
+import { useModeColor } from '../hooks/ColorMode/UseModeTheme';
 import ToastItemComponent from '../components/ToastItemComponent';
-import { SIZES } from '../constans/size';
 
 interface LayoutComponentProps {
-    children: React.ReactNode,
-    fullView?: boolean,
-    urlBackground?: ImageURISource,
-    backgroundStatusBar?: string
+    children: React.ReactNode;
+    fullView?: boolean;
+    urlBackground?: any;  // Có thể sửa nếu có kiểu xác định
+    backgroundStatusBar?: string;
+    style?: ViewStyle; // Cho phép tùy chỉnh thêm kiểu giao diện từ bên ngoài
 }
 
-export default function LayoutComponent({ children, fullView = false, urlBackground, backgroundStatusBar }: LayoutComponentProps) {
+export default function LayoutComponent({
+    children,
+    fullView = false,
+    backgroundStatusBar,
+    style,
+}: LayoutComponentProps) {
     const { isDarkMode } = useModeColor();
 
     const backgroundStyle = {
         backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
     };
 
+    const statusBarBackgroundColor = backgroundStatusBar || (isDarkMode ? Colors.darker : Colors.lighter);
+    const statusBarStyle = isDarkMode ? 'light-content' : 'dark-content';
+
+    const toastConfig: ToastConfig = {
+        success: (props: BaseToastProps) => (
+            <ToastItemComponent text1={props.text1 || ''} text2={props.text2} type="success" />
+        ),
+        error: (props: BaseToastProps) => (
+            <ToastItemComponent text1={props.text1 || ''} text2={props.text2} type="error" />
+        ),
+        info: (props: BaseToastProps) => (
+            <ToastItemComponent text1={props.text1 || ''} text2={props.text2} type="info" />
+        ),
+    };
+
     return (
-        <View style={{ flex: 1, width: '100%', height: '100%' }}>
-            {
-                !fullView
-                    ? (
-                        <SafeAreaView style={[styles.container, backgroundStyle, { marginTop: Platform.OS === 'android' ? 50 : 0 }]}>
-                            <StatusBar
-                                barStyle={!isDarkMode ? "dark-content" : "light-content"}
-                                backgroundColor={isDarkMode ? Colors.darker : Colors.lighter}
-                            />
-                            {children}
-                            <Toast config={{
-                                success: ({ text1, text2 }) => (
-                                    <ToastItemComponent text1={text1} text2={text2} type='success' />
-                                ),
-                                error: ({ text1, text2 }) => (
-                                    <ToastItemComponent text1={text1} text2={text2} type='error' />
-                                ),
-                                info: ({ text1, text2 }) => (
-                                    <ToastItemComponent text1={text1} text2={text2} type='info' />
-                                ),
-                            }} />
-                        </SafeAreaView>
-                    ) : (
-                        <View style={[backgroundStyle, { flex: 1 }]}>
-                            <Toast config={{
-                                success: ({ text1, text2 }) => (
-                                    <ToastItemComponent text1={text1} text2={text2} type='success' />
-                                ),
-                                error: ({ text1, text2 }) => (
-                                    <ToastItemComponent text1={text1} text2={text2} type='error' />
-                                ),
-                                info: ({ text1, text2 }) => (
-                                    <ToastItemComponent text1={text1} text2={text2} type='info' />
-                                ),
-                            }} />
-                            <StatusBar
-                                translucent={!!backgroundStatusBar}
-                                barStyle={!isDarkMode ? "dark-content" : "light-content"}
-                                backgroundColor={!backgroundStatusBar ? isDarkMode ? Colors.darker : Colors.lighter : backgroundStatusBar}
-                            />
-                            {children}
-                        </View>
-                    )
-            }
+        <View style={[styles.fullContainer, style]}>
+            <StatusBar
+                translucent={!!backgroundStatusBar}
+                barStyle={statusBarStyle}
+                backgroundColor={statusBarBackgroundColor}
+            />
+
+            {!fullView ? (
+                <SafeAreaView style={[styles.container, backgroundStyle]}>
+                    {children}
+                </SafeAreaView>
+            ) : (
+                <View style={[backgroundStyle, styles.container]}>{children}</View>
+            )}
+
+            <Toast  config={toastConfig} />
         </View>
-    )
+    );
 }
 
 const styles = StyleSheet.create({
+    fullContainer: {
+        flex: 1,
+        width: '100%',
+        height: '100%',
+    },
     container: {
-        flex: 1
-    }
-})
+        flex: 1,
+    },
+});

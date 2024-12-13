@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-    ScrollView,
     StyleSheet,
     ViewStyle,
     ScrollViewProps,
@@ -35,7 +34,8 @@ const ScrollFullView: React.FC<FullScreenScrollViewProps> = ({
 
 const styles = StyleSheet.create({
     scrollContainer: {
-        flex: 1, // Chiếm toàn bộ chiều cao màn hình
+        width: '100%',
+        height: '100%'
     },
     contentContainer: {
         flexGrow: 1, // Cho phép nội dung co giãn

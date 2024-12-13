@@ -1,1 +1,1 @@
-export const BASE_URL = 'http://192.168.1.16:3000/velo/api'
+export const BASE_URL = 'http://192.168.1.24:3000/velo/api'

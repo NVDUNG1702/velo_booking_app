@@ -5,7 +5,7 @@ import { SportComplex } from '../../../../models/sportComplex';
 import StarRating from '../../../../components/StarRating';
 import { useModeColor } from '../../../../hooks/ColorMode/UseModeTheme';
 import { isValidUrl } from '../../../../untils/validationUrl';
-import { BottomTabBarProps, BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { BottomPraramList } from '../../../../navigations/BottomTabNavigation';
 
 interface ListItemProps {
@@ -34,7 +34,7 @@ const ListItem: React.FC<ListItemProps> = ({ item, navigation }) => {
         >
             <Image
                 onError={() => setImage('https://images.pexels.com/photos/5767580/pexels-photo-5767580.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')}
-                source={{ uri: isValidUrl(item.avatar_image) ? image : 'https://images.pexels.com/photos/5767580/pexels-photo-5767580.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' }}
+                source={{ uri: isValidUrl(item.avatar_image) ? 'https://images.pexels.com/photos/5767580/pexels-photo-5767580.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' : 'https://images.pexels.com/photos/5767580/pexels-photo-5767580.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' }}
                 style={styles.image}
             />
             <View style={styles.content}>

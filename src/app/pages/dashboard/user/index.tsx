@@ -18,9 +18,6 @@ interface UserProps {
     navigation: BottomTabNavigationProp<BottomPraramList, 'user'>
 }
 
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
-
 export default function User({ navigation }: UserProps) {
     const { backgroundStyle, textLight, isDarkMode, toggleColorMode } = useModeColor();
     const IOS = Platform.OS === 'ios';
@@ -51,7 +48,7 @@ export default function User({ navigation }: UserProps) {
 
     return (
         <LayoutComponent >
-            <ScrollFullView style={[backgroundStyle]}>
+            <ScrollFullView style={[backgroundStyle,]}>
                 <Pressable
                     onPressIn={handlePressIn}
                     onPress={handlePressOut}
@@ -112,7 +109,8 @@ const styles = StyleSheet.create({
         width: '90%',
         borderRadius: 20,
         height: 140,
-        marginBottom: 20
+        marginBottom: 20,
+        // marginTop: 50
     },
     avatarContainer: {
         width: 100,

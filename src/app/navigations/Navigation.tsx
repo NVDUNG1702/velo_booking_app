@@ -2,7 +2,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createNavigationContainerRef, NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
 import Intro from '../pages/intro';
 import LoginNavigation from './LoginNavigation';
-import React from 'react';
 import BottomTabNavigation from './BottomTabNavigation';
 import EditProfile from '../pages/user/editProfile';
 import DetailSportComplex from '../pages/sportComplex/detailSportComplex';
@@ -16,10 +15,10 @@ export type StackParamListNav = {
     intro: undefined,
     editProfile: undefined,
     detailSportComplex: {
-        data: SportComplex
+        data: SportComplex,
     },
     detailSlot: {
-        sportComplexId?: number
+        sportComplexId: number
     }
 }
 
@@ -36,7 +35,7 @@ const Navigation = () => {
                 <Stack.Screen name='navHome' component={BottomTabNavigation} />
                 <Stack.Screen name='editProfile' component={EditProfile} />
                 <Stack.Screen name='detailSportComplex' component={DetailSportComplex} />
-                <Stack.Screen name='detailSlot' component={DetailSlot}/>
+                <Stack.Screen name='detailSlot' component={DetailSlot} />
             </Stack.Navigator>
         </NavigationContainer>
     )
