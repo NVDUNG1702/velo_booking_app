@@ -1,4 +1,3 @@
-import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import BottomTabCustomer from '../components/BottomTab/BottomTabCustomer';
 import { Favorite, Home, List, Map, User } from '../pages/dashboard';

@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, PermissionsAndroid, Platform, Alert, Button, Pressable, Modal, LogBox } from 'react-native';
+import { View, Text, StyleSheet, PermissionsAndroid, Platform, Alert, Button, Pressable, Modal, LogBox, TouchableOpacity } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
 import MapboxGL from '@maplibre/maplibre-react-native';
 import { useModeColor } from '../../../hooks/ColorMode/UseModeTheme';
@@ -16,6 +16,12 @@ import StarRating from '../../../components/StarRating';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { BottomPraramList } from '../../../navigations/BottomTabNavigation';
 import { useIsFocused } from '@react-navigation/native';
+import { FlatList, TextInput } from 'react-native-gesture-handler';
+import { BottomSheet, ListItem, Slider } from '@rneui/themed';
+import SportsDetailCard from './components/SportDetailCard';
+import { SIZES } from '../../../constans/size';
+import SportDetail from './components/SportDetailCard';
+
 // import PulseEffect from '../../../components/AnimationLocation';
 const BADMINTON_IMG = require('../../../assets/image/image_icon-sports/marker_badminton.png');
 const BASKETBALL_IMG = require('../../../assets/image/image_icon-sports/marker_basketball.png');
@@ -124,6 +130,11 @@ export const Map = ({ navigation }: MapProps) => {
         });
     }
 
+    const handleCloseModel = () => {
+        setSelectedMarker(undefined)
+        setModalVisible(false)
+    }
+
     const getCurrentLocationAndZoom = () => {
         Geolocation.getCurrentPosition(
             (position) => {
@@ -152,8 +163,71 @@ export const Map = ({ navigation }: MapProps) => {
         );
     };
 
+    // 
+    const [searchTerm, setSearchTerm] = useState<string>('');
+    const [selectedSportType, setSelectedSportType] = useState<string | null>(null);
+
+    const handleSelectSport = (type: string | null) => {
+        setSelectedSportType(type);
+    };
+
     return (
         <View style={[styles.container, { flex: isFocused ? 1 : 0 }]}>
+            <View style={styles.containerMenu}>
+                {/* Thanh Tìm Kiếm */}
+                <TextInput
+                    style={styles.searchInput}
+                    placeholder="Tìm kiếm sân..."
+                    value={searchTerm}
+                    onChangeText={setSearchTerm}
+                    placeholderTextColor={COLORS.black}
+                />
+
+                {/* Danh Sách Loại Sân */}
+                <FlatList
+                    data={sportTypes.filter((type) =>
+                        type.name.toLowerCase().includes(searchTerm.toLowerCase())
+                    )}
+                    keyExtractor={(item) => item.id}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    renderItem={({ item }) => (
+                        <TouchableOpacity
+                            style={[
+                                styles.sportTypeItem,
+                                selectedSportType === item.type && styles.sportTypeItemSelected,
+                            ]}
+                            onPress={() => handleSelectSport(item.type)}
+                        >
+                            {item.type !== null && (
+                                <Image
+                                    source={getMarkerImage(item.type)}
+                                    style={styles.sportTypeIcon}
+                                    resizeMode="contain"
+                                />
+                            )}
+                            <Text
+                                style={[
+                                    styles.sportTypeText,
+                                    selectedSportType === item.type && styles.sportTypeTextSelected,
+                                ]}
+                            >
+                                {item.name}
+                            </Text>
+                        </TouchableOpacity>
+                    )}
+                />
+                {/* <View style={{ width: '70%' }}>
+                    <Slider
+                        maximumValue={100}
+                        minimumValue={0}
+                        step={1}
+                        allowTouchTrack
+                        trackStyle={{ height: 5, backgroundColor: 'transparent' }}
+                        thumbStyle={{ height: 20, width: 20, backgroundColor: 'transparent' }}
+                    />
+                </View> */}
+            </View>
             {currentLocation ? (
                 <>
                     <MapboxGL.MapView
@@ -165,23 +239,25 @@ export const Map = ({ navigation }: MapProps) => {
                         scrollEnabled={true}
                         pitchEnabled={true}
                         rotateEnabled={true}
-                        surfaceView={true}
+                        surfaceView={false}
+                    // preferredFramesPerSecond={1}
                     >
                         <MapboxGL.Camera
                             ref={cameraRef}
-                            zoomLevel={zoomLevel}
-                            // centerCoordinate={currentLocation}
-                            animationDuration={2000}
+                            // zoomLevel={zoomLevel}
+                            centerCoordinate={currentLocation}
+                            animationDuration={100}
                             followUserLocation
+                            followUserMode={MapboxGL.UserTrackingMode.FollowWithHeading}
+                            animationMode="moveTo"
 
-                            followUserMode={MapboxGL.UserTrackingMode.Follow}
+                        // minZoomLevel={12}
                         >
 
                         </MapboxGL.Camera>
 
                         {!loading && dataSportComplex?.data.map((item, i) => {
-                            // console.log(item);
-
+                            if (selectedSportType !== null && selectedSportType !== item.marker) return;
                             return (
                                 <MapboxGL.PointAnnotation
                                     key={item.id}
@@ -190,15 +266,15 @@ export const Map = ({ navigation }: MapProps) => {
                                     // coordinate={listData[i].coordinates}
                                     draggable={false}
                                     onSelected={() => onMarkerPress(item)}
+                                    anchor={{ x: 0.5, y: 0.5 }}
                                 >
-                                    <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                                    <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center' }}>
                                         <Image
                                             source={getMarkerImage(item.marker)}
-                                            style={{ width: 40, height: 40 }}
-                                            resizeMode="contain" // Đảm bảo ảnh hiển thị đúng
+                                            style={{ width: 27, height: 27 }}
+                                            resizeMode="contain"
                                         />
-                                    </View>
-                                    {/* <LocationIcon/> */}
+                                    </TouchableOpacity>
                                 </MapboxGL.PointAnnotation>
                             )
                         })}
@@ -214,8 +290,8 @@ export const Map = ({ navigation }: MapProps) => {
                         >
                             <YourLocationIcon color={skyBlue} />
                         </Pressable>
-                        <Button title="+" onPress={zoomIn} />
-                        <Button title="-" onPress={zoomOut} />
+                        {/* <Button title="+" onPress={zoomIn} />
+                        <Button title="-" onPress={zoomOut} /> */}
                     </View>
                 </>
             ) : (
@@ -226,42 +302,22 @@ export const Map = ({ navigation }: MapProps) => {
             )}
 
             {selectedMarker && modalVisible && (
-                <View style={styles.modalContainer}>
-                    <View style={styles.modalContent}>
-                        <BlurView
-                            style={{ width: '100%', height: '100%', position: 'absolute', }}
-                            blurAmount={6}
-                            blurType='light'
-                        />
-                        <Image
-                            style={{ width: '100%', height: 200, borderWidth: 1, borderColor: 'white', marginBottom: 10, borderTopLeftRadius: 10, borderTopRightRadius: 10 }}
-                            resizeMode='cover'
-                            source={{ uri: 'https://images.pexels.com/photos/5767580/pexels-photo-5767580.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' }}
-                        />
-                        <View style={{ width: '100%', padding: 15, alignItems: 'center' }}>
-                            <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between' }}>
-                                <Text style={[styles.modalTitle]}>{selectedMarker.name}</Text>
-                                <Pressable
-                                    onPress={handleShowDetail}
-                                >
-                                    <EyeHidIcon status color={COLORS.white} />
-                                </Pressable>
-                            </View>
-                            <Text style={styles.modalText}>Địa chỉ: {selectedMarker.location}</Text>
-                            <Text style={styles.modalText}>Loại sân: {selectedMarker.marker}</Text>
-                            <Text style={styles.modalText}>Đánh giá: <StarRating rating={parseFloat(selectedMarker.evaluation_sport)} /></Text>
-                            <ButtonComponent
-                                // style={styles.closeButton}
-                                label='close'
-                                onPress={() => {
-                                    setSelectedMarker(undefined)
-                                    setModalVisible(false)
-                                }}
-                            />
-                        </View>
-                    </View>
-                </View>
+                <SportDetail data={selectedMarker} handleCloseModel={handleCloseModel} />
             )}
+
+            {/* <BottomSheet isVisible={modalVisible} >
+                {
+                    selectedMarker && <SportsDetailCard data={selectedMarker} />
+                }
+                <ButtonComponent
+                    // style={styles.closeButton}
+                    label='close'
+                    onPress={() => {
+                        setSelectedMarker(undefined)
+                        setModalVisible(false)
+                    }}
+                />
+            </BottomSheet> */}
         </View>
     );
 };
@@ -269,9 +325,12 @@ export const Map = ({ navigation }: MapProps) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        position: 'relative'
     },
     map: {
-        flex: 1,
+        // flex: 1,
+        width: '100%',
+        height: '100%'
     },
     loading: {
         flex: 1,
@@ -285,48 +344,60 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'space-between',
     },
-    modalContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        // overflow: 'hidden'
-        position: 'absolute',
-        bottom: 0,
-        top: 0,
-        left: 0,
-        right: 0
 
+
+    // menu
+    containerMenu: {
+        position: 'absolute',
+        top: 50, // Nổi lên trên cùng
+        left: 0,
+        right: 0,
+        // backgroundColor: '#FFF',
+        // padding: 15,
+        borderRadius: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        elevation: 5,
+        zIndex: 99,
+        alignItems: 'center'
     },
-    modalContent: {
-        width: '90%',
-        backgroundColor: 'rgba(0, 0, 0, 0.1)',
-        borderRadius: 10,
-        alignItems: 'center',
-        overflow: 'hidden',
-    },
-    modalTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 10,
-        width: '70%',
-        color: COLORS.white
-    },
-    modalText: {
+    searchInput: {
+        height: 40,
+        backgroundColor: '#EFEFEF',
+        borderRadius: 25,
+        paddingHorizontal: 10,
+        marginBottom: 15,
         fontSize: 16,
-        marginBottom: 5,
-        width: '100%',
-        color: COLORS.white
+        width: '98%',
+        color: COLORS.black
     },
-    closeButton: {
-        marginTop: 15,
-        backgroundColor: 'blue',
-        padding: 10,
-        borderRadius: 5,
+
+    sportTypeItem: {
+        backgroundColor: '#E0E0E0',
+        paddingVertical: 3,
+        marginHorizontal: 5,
+        borderRadius: 20,
+        alignItems: 'center',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        paddingHorizontal: 10
     },
-    closeButtonText: {
-        color: 'white',
-        fontWeight: 'bold',
+    sportTypeItemSelected: {
+        backgroundColor: COLORS.skyBlue,
+    },
+    sportTypeIcon: {
+        height: 25,
+        width: 25
+    },
+    sportTypeText: {
+        fontSize: 16,
+        color: '#333',
+        textAlign: 'center',
+    },
+    sportTypeTextSelected: {
+        color: '#FFF',
     },
 });
 
@@ -342,7 +413,7 @@ const EMarkerSports = {
     VOLLEYBALL: 'VOLLEYBALL',
 };
 
-const getMarkerImage = (type: string) => {
+const getMarkerImage = (type: string | null) => {
     switch (type) {
         case "BADMINTON":
             return BADMINTON_IMG;
@@ -362,3 +433,14 @@ const getMarkerImage = (type: string) => {
             return null;
     }
 };
+
+const sportTypes = [
+    { id: '0', name: 'Tất cả', type: null },
+    { id: '1', name: 'Tổng hợp', type: EMarkerSports.MULTIPLE },
+    { id: '2', name: 'Bóng Đá', type: EMarkerSports.FOOBALL },
+    { id: '3', name: 'Bóng Rổ', type: EMarkerSports.BASKETBALL },
+    { id: '4', name: 'Tennis', type: EMarkerSports.TENNIS },
+    { id: '5', name: 'Cầu Lông', type: EMarkerSports.BADMINTON },
+    { id: '6', name: 'Pickleball', type: EMarkerSports.PICKLEBALL },
+    { id: '7', name: 'Bóng Chuyền', type: EMarkerSports.VOLLEYBALL },
+];

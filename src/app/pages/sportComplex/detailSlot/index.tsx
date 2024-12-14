@@ -17,7 +17,7 @@ import { RouteProp } from '@react-navigation/native';
 import { StackParamListNav } from '../../../navigations/Navigation';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useModeColor } from '../../../hooks/ColorMode/UseModeTheme';
-import { SlotOrder } from '../../../models/booking';
+import { Field, SlotOrder } from '../../../models/booking';
 import LoadingComponent from '../../../components/LoadingComponent';
 import BoxStatus from './components/BoxStatus';
 import { formatDate, formatTimeTable } from '../../../untils/formatTime';
@@ -26,6 +26,9 @@ import { COLORS } from '../../../constans/color';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import CalendarIcon from '../../../assets/IconComponents/IconCalendar';
 import { SIZES } from '../../../constans/size';
+import ButtonComponent from '../../../components/ButtonComponent';
+import { formatCurrencyVND } from '../../../untils/formatAmout';
+import { BottomSheet, ListItem } from '@rneui/base';
 
 interface DetailSlotProps {
     route: RouteProp<StackParamListNav, 'detailSlot'>;
@@ -37,12 +40,16 @@ interface DetailSlotProps {
 
 const DetailSlot = ({ route, navigation }: DetailSlotProps) => {
     const { sportComplexId } = route.params;
-    const { fields, getSlots, loading, updateDataBooKing, dataBoking } = bookingStore();
+    const { fields, getSlots, loading, updateDataBooKing, dataBooking, resetDataBooking } = bookingStore();
     const { skyBlue, isDarkMode, textLight, darkGrayLight } = useModeColor();
+
+    const [showDetailAmouts, setShowDetailAmouts] = useState(false);
+
     const HEIGHT_TABLE = 50;
     const WIDTH_BOX_TABLE = 50;
 
     useEffect(() => {
+        resetDataBooking();
         const today = new Date();
         getSlots({ id: sportComplexId, time: formatDate(today) });
     }, []);
@@ -52,11 +59,12 @@ const DetailSlot = ({ route, navigation }: DetailSlotProps) => {
     };
 
     const isSlotInOrder = (slot: SlotOrder): boolean => {
-        return dataBoking?.order?.some(
+        return dataBooking?.order?.some(
             (orderSlot) =>
                 orderSlot.yard_id === slot.yard_id &&
                 orderSlot.start_time === slot.start_time &&
-                orderSlot.end_time === slot.end_time
+                orderSlot.end_time === slot.end_time &&
+                orderSlot.day === slot.day
         ) || false;
     };
 
@@ -81,7 +89,12 @@ const DetailSlot = ({ route, navigation }: DetailSlotProps) => {
                             key={`slot-${field.id}-${slot.start_time}`}
                             style={[
                                 styles.slotBox,
-                                { backgroundColor, width: WIDTH_BOX_TABLE, height: HEIGHT_TABLE },
+                                {
+                                    backgroundColor,
+                                    width: WIDTH_BOX_TABLE,
+                                    height: HEIGHT_TABLE,
+                                    borderColor: isSlotOrder ? 'white' : COLORS.skyBlue
+                                },
                             ]}
                             disabled={isBooked !== 'empty' || isExpired}
                             onPress={() => handleAddSlot({ ...slot, yard_id: field.id })}
@@ -95,6 +108,10 @@ const DetailSlot = ({ route, navigation }: DetailSlotProps) => {
     const [date, setDate] = useState<Date>(new Date());
     const [tempDate, setTempDate] = useState<Date>(new Date());
     const [show, setShow] = useState<boolean>(false);
+
+    useEffect(()=>{
+        getSlots({ id: sportComplexId, time: formatDate(date) });
+    }, [date]);
 
     const onChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
         if (event.type === 'set' && selectedDate && Platform.OS === 'android') {
@@ -119,6 +136,25 @@ const DetailSlot = ({ route, navigation }: DetailSlotProps) => {
     const cancelDate = () => {
         setShow(false);
     };
+
+    // total
+    const calculateTotalAmount = (fields: Field[], order: SlotOrder[] | undefined) => {
+        if (!order || !fields) return 0;
+
+        // Tạo một bản đồ từ id sân đến giá tiền để tìm nhanh
+        const fieldAmountMap = new Map(
+            fields.map(field => [field.id, parseFloat(field.amount) || 0])
+        );
+
+        // Tính tổng giá tiền
+        const totalAmount = order.reduce((total, orderItem) => {
+            return total + (fieldAmountMap.get(orderItem.yard_id) || 0);
+        }, 0);
+
+        return totalAmount;
+    };
+
+    const totalAmount = calculateTotalAmount(fields, dataBooking?.order)
 
 
     return (
@@ -192,6 +228,11 @@ const DetailSlot = ({ route, navigation }: DetailSlotProps) => {
                             <BoxStatus label="Đã đặt" color="#E72A2A" />
                         </View>
                     </ScrollView>
+                    <TouchableOpacity
+                        onPress={() => { setShowDetailAmouts(true) }}
+                    >
+                        <Text style={{ textDecorationLine: 'underline', color: 'white' }}>Xem bảng giá</Text>
+                    </TouchableOpacity>
 
                     <View style={styles.tableContainer}>
                         <View style={[styles.leftColumn]}>
@@ -230,6 +271,42 @@ const DetailSlot = ({ route, navigation }: DetailSlotProps) => {
                     </View>
                 </View>
             )}
+            <View style={{ width: '100%', position: 'absolute', bottom: 5, alignItems: 'center' }}>
+                <Text style={{ width: '90%', fontWeight: '500' }}>Tổng số tiền tạm tính: {formatCurrencyVND(totalAmount)}</Text>
+                <ButtonComponent label={`Đặt ngay`} disabled={totalAmount === 0} marginT={5} />
+            </View>
+
+            <BottomSheet isVisible={showDetailAmouts} >
+                <ScrollView style={{ width: '90%', margin: 'auto' }}>
+                    {fields.map((field, i) => (
+                        <ListItem key={field.id}>
+                            <ListItem.Content>
+                                <ListItem.Title style={styles.fieldName}>
+                                    {`Sân: ${i+1}`}
+                                </ListItem.Title>
+                                <ListItem.Subtitle style={styles.price}>
+                                    {formatCurrencyVND(field.amount)}
+                                </ListItem.Subtitle>
+                                <Text style={styles.details}>
+                                    Loại sân: {field.surfaceType} - Kích thước: {field.dimensions}
+                                </Text>
+                                <Text style={styles.details}>
+                                    Ghi chú: {field.notes || "Không có"}
+                                </Text>
+                            </ListItem.Content>
+                        </ListItem>
+                    ))}
+                </ScrollView>
+                <View style={{ width: '100%', alignItems: 'center' }}>
+                    <ButtonComponent
+                        // style={styles.closeButton}
+                        label='close'
+                        onPress={() => {
+                            setShowDetailAmouts(false);
+                        }}
+                    />
+                </View>
+            </BottomSheet>
         </LayoutComponent>
     );
 };
@@ -364,7 +441,25 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         alignItems: 'center',
         marginStart: 10
-    }
+    },
+
+    // 
+    bottomSheetContainer: {
+        backgroundColor: 'rgba(0, 0, 0, 1)',
+    },
+    fieldName: {
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    price: {
+        fontSize: 16,
+        color: '#2e7d32',
+        marginVertical: 4,
+    },
+    details: {
+        fontSize: 14,
+        color: '#555',
+    },
 });
 
 

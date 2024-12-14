@@ -13,6 +13,8 @@ import { BottomPraramList } from '../../../navigations/BottomTabNavigation';
 import axios from 'axios';
 import { Modal } from 'react-native';
 import { COLORS } from '../../../constans/color';
+import { SportComplex } from '../../../models/sportComplex';
+import Nodata from '../../../components/Nodata';
 
 
 interface Province {
@@ -35,10 +37,12 @@ const ListPage = ({ navigation }: ListPageProps) => {
     const [refresh, setRefresh] = useState(false);
     const { skyBlue, isDarkMode, textLight, backgroundStyle } = useModeColor();
 
+    const [search, setSearch] = useState('');
+
     const [provinces, setProvinces] = useState<Province[]>([]);
     const [districts, setDistricts] = useState<District[]>([]);
-    const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
-    const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
+    const [selectedProvince, setSelectedProvince] = useState<Province | null>(null);
+    const [selectedDistrict, setSelectedDistrict] = useState<District | null>(null);
     const [isLoading, setLoading] = useState<boolean>(true);
 
     const [isProvinceModalVisible, setProvinceModalVisible] = useState(false);
@@ -71,17 +75,17 @@ const ListPage = ({ navigation }: ListPageProps) => {
         fetchProvinces();
     }, []);
 
-    const handleProvinceSelect = (provinceName: string) => {
-        const selected = provinces.find((p) => p.name === provinceName);
-        setSelectedProvince(provinceName);
+    const handleProvinceSelect = (provinceSelect: Province) => {
+        const selected = provinces.find((p) => p.name === provinceSelect.name);
+        setSelectedProvince(provinceSelect);
         setDistricts(selected?.districts || []);
-        setSelectedDistrict(null); // Reset quận huyện khi thay đổi tỉnh
-        setProvinceModalVisible(false); // Ẩn modal
+        setSelectedDistrict(null);
+        setProvinceModalVisible(false);
     };
 
-    const handleDistrictSelect = (districtName: string) => {
-        setSelectedDistrict(districtName);
-        setDistrictModalVisible(false); // Ẩn modal
+    const handleDistrictSelect = (district: District) => {
+        setSelectedDistrict(district);
+        setDistrictModalVisible(false);
     };
 
     const filteredProvinces = provinces.filter((province) =>
@@ -99,84 +103,115 @@ const ListPage = ({ navigation }: ListPageProps) => {
         setProvinceModalVisible(false); // Ẩn modal
     };
 
+    const filterSportComplex = (data: SportComplex[] | undefined, provinceId: number | undefined, districtId: number | undefined, search: string) => {
+        if (!data) return [];
+
+        // Lọc theo provinceId nếu có
+        if (provinceId) {
+            data = data.filter(item => item?.provincesId === provinceId.toString());
+        }
+
+        // Lọc theo districtId nếu có
+        if (districtId) {
+            data = data.filter(item => item?.districtId === districtId.toString());
+        }
+
+        // Lọc theo từ khóa search nếu có
+        if (search.trim() !== "") {
+            const searchLower = search.toLowerCase();
+            data = data.filter(
+                item =>
+                    item.name.toLowerCase().includes(searchLower) ||
+                    item.description.toLowerCase().includes(searchLower)
+            );
+        }
+
+        return data;
+    };
+
+    const dataFilter = filterSportComplex(dataSportComplex?.data, selectedProvince?.code, selectedDistrict?.code, search)
+
+
     return (
         <LayoutComponent >
             <View style={[styles.container]}>
-                {/* <LoadingComponent loading={loading} /> */}
-                <View>
-                    <View style={styles.header}>
-                        <Text style={[styles.logo, { color: skyBlue }]}>VELO</Text>
-                        <LogoIcon />
-                    </View>
-                    <View style={[styles.searchContainer, { backgroundColor: isDarkMode ? '#c2c2c2' : 'white' }]}>
-                        <TextInput
-                            placeholder="Search..."
-                            style={[styles.searchInput,]}
-                            placeholderTextColor={'black'}
-                        />
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 15 }}>
-                        {loading ? (
-                            <ActivityIndicator size="large" color="#007BFF" />
-                        ) : (
-                            <>
-                                <TouchableOpacity
-                                    style={styles.selectButton}
-                                    onPress={() => setProvinceModalVisible(true)}
-                                >
-                                    <Text
-                                        style={[styles.selectButtonText, {color: textLight}]}
-                                    >
-                                        {selectedProvince || 'Chọn tỉnh thành'}
-                                    </Text>
-                                </TouchableOpacity>
+                <LoadingComponent loading={loading} />
+                {
+                    !loading &&
+                    (
+                        <>
+                            <View>
+                                <View style={styles.header}>
+                                    <Text style={[styles.logo, { color: skyBlue }]}>VELO</Text>
+                                    <LogoIcon />
+                                </View>
+                                <View style={[styles.searchContainer, { backgroundColor: isDarkMode ? '#c2c2c2' : 'white' }]}>
+                                    <TextInput
+                                        placeholder="Search..."
+                                        style={[styles.searchInput,]}
+                                        placeholderTextColor={'black'}
+                                        value={search}
+                                        onChangeText={setSearch}
+                                    />
+                                </View>
+                                <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 15 }}>
 
-                                <TouchableOpacity
-                                    style={styles.selectButton}
-                                    onPress={() =>
-                                        selectedProvince
-                                            ? setDistrictModalVisible(true)
-                                            : Alert.alert('Thông báo', 'Bạn cần chọn tỉnh thành trước!')
-                                    }
-                                >
-                                    <Text
-                                        style={[styles.selectButtonText, {color: textLight}]}
+                                    <TouchableOpacity
+                                        style={styles.selectButton}
+                                        onPress={() => setProvinceModalVisible(true)}
                                     >
-                                        {selectedDistrict || 'Chọn quận huyện'}
-                                    </Text>
-                                </TouchableOpacity>
+                                        <Text
+                                            style={[styles.selectButtonText, { color: textLight }]}
+                                        >
+                                            {selectedProvince?.name || 'Chọn tỉnh thành'}
+                                        </Text>
+                                    </TouchableOpacity>
 
-                                {/* {selectedProvince && selectedDistrict && (
-                                    <View style={styles.resultContainer}>
-                                        <Text style={styles.resultText}>Tỉnh: {selectedProvince}</Text>
-                                        <Text style={styles.resultText}>Quận huyện: {selectedDistrict}</Text>
-                                    </View>
-                                )} */}
-                            </>
-                        )}
-                    </View>
-                </View>
-                {dataSportComplex && (
-                    <FlatList
-                        data={dataSportComplex.data}
-                        keyExtractor={(item) => item.id.toString()}
-                        renderItem={({ item }) => <ListItem item={item} navigation={navigation} />}
-                        showsVerticalScrollIndicator={false}
-                        refreshing={loading}
-                        refreshControl={
-                            <RefreshControl
-                                refreshing={refresh}
-                                onRefresh={handleRefresh}
-                                colors={['#007BFF']} // Màu Android
-                                tintColor="#007BFF" // Màu iOS
-                                title="Đang làm mới..."
-                                titleColor="#007BFF"
-                            />
-                        }
-                        contentContainerStyle={{ width: '100%', }}
-                        style={{ width: '100%', marginBottom: 50, padding: 0, marginHorizontal: 0 }}
-                    />
-                )}
+                                    <TouchableOpacity
+                                        style={styles.selectButton}
+                                        onPress={() =>
+                                            selectedProvince
+                                                ? setDistrictModalVisible(true)
+                                                : Alert.alert('Thông báo', 'Bạn cần chọn tỉnh thành trước!')
+                                        }
+                                    >
+                                        <Text
+                                            style={[styles.selectButtonText, { color: textLight }]}
+                                        >
+                                            {selectedDistrict?.name || 'Chọn quận huyện'}
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                            {dataSportComplex && dataFilter.length !== 0
+                                ? (
+                                    <FlatList
+                                        data={dataFilter}
+                                        keyExtractor={(item) => item.id.toString()}
+                                        renderItem={({ item }) => <ListItem item={item} navigation={navigation} />}
+                                        showsVerticalScrollIndicator={false}
+                                        // refreshing={loading}
+                                        refreshControl={
+                                            <RefreshControl
+                                                refreshing={refresh}
+                                                onRefresh={handleRefresh}
+                                                colors={['#007BFF']} // Màu Android
+                                                tintColor="#007BFF" // Màu iOS
+                                                title="Đang làm mới..."
+                                                titleColor="#007BFF"
+                                            />
+                                        }
+                                        contentContainerStyle={{ width: '100%', }}
+                                        style={{ width: '100%', marginBottom: 50, padding: 0, marginHorizontal: 0 }}
+                                    />
+                                )
+                                : (
+                                    <Nodata />
+                                )
+                            }
+                        </>
+                    )
+                }
 
                 {/* Modal Chọn Tỉnh Thành */}
                 <Modal visible={isProvinceModalVisible} animationType="slide">
@@ -194,9 +229,9 @@ const ListPage = ({ navigation }: ListPageProps) => {
                             renderItem={({ item }) => (
                                 <TouchableOpacity
                                     style={styles.modalItem}
-                                    onPress={() => handleProvinceSelect(item.name)}
+                                    onPress={() => handleProvinceSelect(item)}
                                 >
-                                    <Text style={[styles.modalText, {color: textLight}]}>{item.name}</Text>
+                                    <Text style={[styles.modalText, { color: textLight }]}>{item.name + ' - ' + item.code}</Text>
                                 </TouchableOpacity>
                             )}
                         />
@@ -236,9 +271,9 @@ const ListPage = ({ navigation }: ListPageProps) => {
                             renderItem={({ item }) => (
                                 <TouchableOpacity
                                     style={styles.modalItem}
-                                    onPress={() => handleDistrictSelect(item.name)}
+                                    onPress={() => handleDistrictSelect(item)}
                                 >
-                                    <Text style={[styles.modalText, {color: textLight}]}>{item.name}</Text>
+                                    <Text style={[styles.modalText, { color: textLight }]}>{item.name + ' - ' + item.code}</Text>
                                 </TouchableOpacity>
                             )}
                         />

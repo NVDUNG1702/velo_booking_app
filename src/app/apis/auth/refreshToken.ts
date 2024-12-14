@@ -32,8 +32,6 @@ export const getTokenFromRefreshToken = async (refreshToken: string, clientID: n
 
         return response.data;
     } catch (error: any) {
-        console.error("Refresh token error:", error.message || error);
-
         throw new Error(
             `Failed to refresh token: ${error.response?.data?.message || "Unknown error"}`
         );

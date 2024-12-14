@@ -82,8 +82,6 @@ const DetailSportComplex: React.FC<DetailSportComplexProps> = ({ route, navigati
                             <Image source={{ uri: item }} style={styles.bannerImage} resizeMode="cover" />
                         )}
                         style={{ width: '100%', height: '100%' }}
-                        // style={{ width: '100%', height: '100%' }}
-                        // contentContainerStyle={{ width: '100%' }}
                     />
                     <TouchableOpacity
                         style={styles.backButton}

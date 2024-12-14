@@ -1,5 +1,3 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
 import { ForgotPass, Signin, Signup } from '../pages/auth/index';
 import OTPSignUp from '../pages/auth/otp_signup';
@@ -23,5 +21,3 @@ export default function LoginNavigation() {
         </Stack.Navigator>
     )
 }
-
-const styles = StyleSheet.create({})

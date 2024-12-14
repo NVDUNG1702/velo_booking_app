@@ -5,6 +5,8 @@ import { jwtDecode } from 'jwt-decode';
 import dayjs from "dayjs";
 import { getTokenFromRefreshToken } from "../apis/auth/refreshToken";
 import { navigationRef } from "../navigations/Navigation";
+import { BASE_URL } from "../../config/api.config";
+import { ToastError } from "../untils/ToastMessage/toast";
 
 class AxiosService {
     private service: AxiosInstance;
@@ -15,7 +17,7 @@ class AxiosService {
         this.init();
 
         const service = axios.create({
-            baseURL: process.env.REACT_APP_URL_API,
+            baseURL: BASE_URL,
             headers: {}
         })
 
@@ -24,12 +26,20 @@ class AxiosService {
 
                 if (!this.JWT || !this.refreshToken) await this.initToken();
 
-                if (!this.JWT || !this.refreshToken) return config;
+                if (!this.JWT || !this.refreshToken) {
+                    this.clearData();
+                    navigationRef.navigate("login");
+                    return config
+                };
 
                 let decodeRefreshToken: any = jwtDecode(this.refreshToken);
                 const isExpiredRefreshToken = dayjs.unix(decodeRefreshToken?.exp).diff(dayjs()) > 1;
 
-                if (!isExpiredRefreshToken) return config;
+                if (!isExpiredRefreshToken){ 
+                    this.clearData();
+                    navigationRef.navigate("login");
+                    return config;
+                };
 
                 let user: any = jwtDecode(this.JWT);
                 const isExpired = dayjs.unix(user?.exp).diff(dayjs()) > 1;
@@ -37,6 +47,7 @@ class AxiosService {
                 if (!isExpired) {
                     let newToken = await getTokenFromRefreshToken(this.refreshToken, user.id);
                     if (!newToken) {
+                        navigationRef.navigate("login");
                         await removeDataStorage(ACCESS_TOKEN);
                         await removeDataStorage(REFRESH_TOKEN);
                         return config;
@@ -55,8 +66,6 @@ class AxiosService {
                 config.headers.set('Authorization', `Bearer ${this.JWT}`);
                 config.headers.set('rf-token', this.refreshToken);
                 config.headers.set('x-client-id', user.id);
-                console.log('test');
-
                 return config;
             },
             async function (error) {
@@ -87,27 +96,35 @@ class AxiosService {
     private async handleResponseError(error: any) {
         const caseToRedirectLogin = ['Invalid token.', 'User Not Found'];
         if (caseToRedirectLogin.includes(error.response?.data?.message)) {
-            this.redirectToLogin();
+            this.clearData();
+            navigationRef.navigate("login");
             return;
         }
         if (error?.response?.tatus === 401) {
-            this.redirectToLogin();
+            this.clearData();
+            navigationRef.navigate("login");
             return;
         }
         if (error?.response?.tatus === 403) {
             await this.initToken();
             if (!this.JWT || !this.refreshToken) {
-                this.redirectToLogin();
+                this.clearData();
+                navigationRef.navigate("login");
                 return;
             }
             let decodeRefreshToken: any = jwtDecode(this.refreshToken);
             const isExpiredRefreshToken = dayjs.unix(decodeRefreshToken?.exp).diff(dayjs()) > 1;
 
-            if (!isExpiredRefreshToken) return Promise.reject(error);
+            if (!isExpiredRefreshToken) {
+                this.clearData();
+                navigationRef.navigate("login");
+                return Promise.reject(error)
+            };
             let newToken = await getTokenFromRefreshToken(this.refreshToken, decodeRefreshToken.id);
             if (!newToken) {
                 await removeDataStorage(ACCESS_TOKEN);
                 await removeDataStorage(REFRESH_TOKEN);
+                navigationRef.navigate("login");
                 return error;
             }
 
@@ -119,15 +136,14 @@ class AxiosService {
             await setDataStorage(REFRESH_TOKEN, refreshToken);
             return this.service.request(error.config)
         }
+        ToastError('Error', 'Something wrong!');
+        navigationRef.navigate("login");
         return Promise.reject(error);
     }
 
-    redirectToLogin() {
-        if (navigationRef.isReady()) {
-            navigationRef.navigate("login");
-            removeDataStorage(ACCESS_TOKEN);
-            removeDataStorage(REFRESH_TOKEN);
-        }
+    clearData() {
+        removeDataStorage(ACCESS_TOKEN);
+        removeDataStorage(REFRESH_TOKEN);
     }
 
     get(endpoint: string, config?: AxiosRequestConfig<any>) {
