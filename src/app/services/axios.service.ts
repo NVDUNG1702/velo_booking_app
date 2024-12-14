@@ -29,7 +29,7 @@ class AxiosService {
                 if (!this.JWT || !this.refreshToken) {
                     this.clearData();
                     navigationRef.navigate("login");
-                    return config
+                    return config;
                 };
 
                 let decodeRefreshToken: any = jwtDecode(this.refreshToken);
@@ -94,12 +94,12 @@ class AxiosService {
     }
 
     private async handleResponseError(error: any) {
-        const caseToRedirectLogin = ['Invalid token.', 'User Not Found'];
-        if (caseToRedirectLogin.includes(error.response?.data?.message)) {
-            this.clearData();
-            navigationRef.navigate("login");
-            return;
-        }
+        // const caseToRedirectLogin = ['Invalid token.', 'User Not Found'];
+        // if (caseToRedirectLogin.includes(error.response?.data?.message)) {
+        //     this.clearData();
+        //     navigationRef.navigate("login");
+        //     return;
+        // }
         if (error?.response?.tatus === 401) {
             this.clearData();
             navigationRef.navigate("login");
@@ -136,8 +136,6 @@ class AxiosService {
             await setDataStorage(REFRESH_TOKEN, refreshToken);
             return this.service.request(error.config)
         }
-        ToastError('Error', 'Something wrong!');
-        navigationRef.navigate("login");
         return Promise.reject(error);
     }
 
